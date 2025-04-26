@@ -12,5 +12,8 @@
     "web-shell"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^14.2.1"
+  }
 }
