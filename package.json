@@ -1,0 +1,16 @@
+{
+  "name": "web-shell",
+  "version": "1.0.0",
+  "description": "Web Shell Firebase App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Building project\" && exit 0"
+  },
+  "keywords": [
+    "firebase",
+    "web-shell"
+  ],
+  "author": "",
+  "license": "MIT"
+}
