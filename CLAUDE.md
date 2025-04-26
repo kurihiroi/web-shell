@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 - Setup: `pnpm install` and `npm install -g firebase-tools` 
+- Firebase Setup: `./scripts/setup-firebase-env.sh <project-id>` (sets up Firebase environment variables)
 - Dev: `pnpm dev` or `firebase emulators:start`
 - Build: `pnpm build` or `turbo run build`
 - Lint: `pnpm lint` or `pnpm lint:biome`
