@@ -27,7 +27,7 @@ button:hover {
   border-color: #646cff;
 }
 
-.ramda-example, .zod-example {
+.ramda-example, .zod-example, .auth-example {
   margin-top: 2rem;
   padding: 1.5rem;
   border: 1px solid #eee;

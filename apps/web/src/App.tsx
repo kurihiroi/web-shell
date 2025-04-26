@@ -3,6 +3,9 @@ import type { ReactElement } from 'react';
 import './App.css';
 import { FormSchema } from './utils/validation';
 import { getPositiveNumbersSum, doubleAllNumbers } from './utils/helpers';
+import { AuthProvider } from './context/AuthContext';
+import AuthStatus from './components/Auth/AuthStatus';
+import './components/Auth/Auth.css';
 
 function App(): ReactElement {
   const [count, setCount] = useState<number>(0);
@@ -35,7 +38,7 @@ function App(): ReactElement {
   const doubledNumbers = doubleAllNumbers(numbers);
   
   return (
-    <>
+    <AuthProvider>
       <div className="app">
         <h1>Web Shell</h1>
         
@@ -43,6 +46,11 @@ function App(): ReactElement {
           <button type="button" onClick={() => setCount((count) => count + 1)}>
             count is {count}
           </button>
+        </div>
+
+        <div className="auth-example">
+          <h3>Firebase Auth Example</h3>
+          <AuthStatus />
         </div>
 
         <div className="ramda-example">
@@ -87,7 +95,7 @@ function App(): ReactElement {
           )}
         </div>
       </div>
-    </>
+    </AuthProvider>
   );
 }
 
