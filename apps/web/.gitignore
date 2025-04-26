@@ -8,35 +8,17 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-.DS_Store
 dist
 dist-ssr
-coverage
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# Yarn Berry
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-
-# Turbo
-.turbo
-
-# Firebase
-firebase-debug.log*
-firebase-debug.*.log*
-.firebase/
-.dataconnect
-
-# Build artifacts
-public/assets

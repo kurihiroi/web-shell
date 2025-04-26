@@ -1,16 +1,17 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. This project uses Node.js 22.
 
 ## Commands
-- Setup: `npm install` and `npm install -g firebase-tools`
+- Setup: `yarn install` and `npm install -g firebase-tools`
 - Init Firebase: `firebase init`
 - Serve: `firebase emulators:start`
 - Deploy: `firebase deploy`
 - Functions: `firebase deploy --only functions`
 - Hosting: `firebase deploy --only hosting`
-- Lint: `npm run lint` (after setting up ESLint)
-- Tests: `npm test` (after setting up testing framework)
+- Lint: `yarn lint`
+- Tests: `yarn test`
+- Dev: `yarn dev`
 
 ## Code Style Guidelines
 - **Formatting**: Use 2-space indentation, no trailing whitespace
@@ -21,6 +22,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Firebase**: Keep security rules principle of least privilege
 - **Database**: Structure Firestore data for shallow queries and minimal reads
 - **Authentication**: Use Firebase Auth for user management
+
+## Project Structure
+- **Monorepo**: Uses Turborepo for managing the monorepo
+- **Apps**: Contains the main applications
+  - `web`: Main React web application built with Vite
+- **Packages**: Contains shared packages used across apps
 
 ## Notes
 This repository uses Firebase for backend and hosting. Follow the Firebase documentation for best practices on security rules, data modeling, and deployment.
