@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import type { ReactElement } from 'react';
 import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+function App(): ReactElement {
+  const [count, setCount] = useState<number>(0);
 
   return (
     <>
