@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "web-shell",
     "public": "public",
     "ignore": [
       "firebase.json",
