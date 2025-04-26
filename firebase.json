@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "web-shell",
-    "public": "public",
+    "public": "apps/web/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -13,5 +13,13 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "emulators": {
+    "hosting": {
+      "port": 5000
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }

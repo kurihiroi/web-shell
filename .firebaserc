@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "ailiaxui"
+  },
+  "targets": {
+    "ailiaxui": {
+      "hosting": {
+        "web-shell": [
+          "web-shell"
+        ]
+      }
+    }
   }
 }
