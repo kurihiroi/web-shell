@@ -4,9 +4,11 @@ Utility scripts for the web-shell project.
 
 ## Firebase Environment Setup
 
-### `setup-firebase-env.sh`
+There are two scripts available for setting up Firebase configuration:
 
-This script helps you set up Firebase configuration for the project by fetching settings from your Firebase project and creating the `.env.local` file with the appropriate environment variables.
+### 1. `setup-firebase-env.sh` (Manual)
+
+This script helps you set up Firebase configuration by guiding you through manual steps to fetch settings from Firebase Console and create the `.env.local` file with the appropriate environment variables.
 
 #### Usage
 
@@ -29,10 +31,35 @@ This script helps you set up Firebase configuration for the project by fetching 
 - Firebase account with access to the project
 - Browser access to Firebase Console
 
+### 2. `auto-setup-firebase.js` (Automated)
+
+This script automatically fetches Firebase configuration using the Firebase Admin SDK and creates the `.env.local` file with minimal manual intervention.
+
+#### Usage
+
+```bash
+node scripts/auto-setup-firebase.js <project-id>
+```
+
+#### What it does
+
+1. Checks prerequisites (firebase-admin package, project ID)
+2. Automatically retrieves Firebase configuration using Admin SDK
+3. Creates or uses an existing Web App in your Firebase project
+4. Generates the `.env.local` file with all required environment variables
+5. Provides guidance for setting up Google authentication
+
+#### Requirements
+
+- Node.js 14+
+- Firebase CLI tools installed and logged in
+- Service account with appropriate permissions for your Firebase project
+- Admin SDK service account credentials (the script will guide you to create these if needed)
+
 #### Example
 
 ```bash
-./scripts/setup-firebase-env.sh my-firebase-project
+node scripts/auto-setup-firebase.js my-firebase-project
 ```
 
-After running the script, the environment variables will be properly set up for the web application to connect to Firebase and enable authentication.
+After running either script, the environment variables will be properly set up for the web application to connect to Firebase and enable authentication.
