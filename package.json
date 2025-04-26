@@ -3,28 +3,24 @@
   "version": "1.0.0",
   "description": "Web Shell Firebase App",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
+  "packageManager": "pnpm@10.9.0",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
+    "lint:biome": "biome lint .",
+    "format": "biome format . --write",
+    "check": "biome check .",
     "test": "turbo run test",
     "clean": "turbo run clean",
     "firebase:dev": "firebase emulators:start"
   },
-  "keywords": [
-    "firebase",
-    "web-shell",
-    "turborepo",
-    "vite",
-    "react"
-  ],
+  "keywords": ["firebase", "web-shell", "turborepo", "vite", "react"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "firebase-tools": "^14.2.1",
     "turbo": "^2.5.2"
   }
