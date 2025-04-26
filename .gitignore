@@ -24,10 +24,13 @@ coverage
 *.sln
 *.sw?
 
-# Yarn Berry
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
+# Package managers
+.yarn
+yarn-error.log
+yarn.lock
+.yarnrc.yml
+.pnpm-store
+pnpm-lock.yaml
 
 # Turbo
 .turbo
