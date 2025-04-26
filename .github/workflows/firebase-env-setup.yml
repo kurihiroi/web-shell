@@ -1,0 +1,22 @@
+name: Setup Firebase Environment
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+    # このワークフローは他のワークフローから呼び出すことができます
+
+jobs:
+  setup-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create .env file
+        run: |
+          echo "VITE_FIREBASE_API_KEY=${{ vars.FIREBASE_API_KEY }}" >> apps/web/.env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ vars.FIREBASE_AUTH_DOMAIN }}" >> apps/web/.env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}" >> apps/web/.env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ vars.FIREBASE_STORAGE_BUCKET }}" >> apps/web/.env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ vars.FIREBASE_MESSAGING_SENDER_ID }}" >> apps/web/.env
+          echo "VITE_FIREBASE_APP_ID=${{ vars.FIREBASE_APP_ID }}" >> apps/web/.env
+      
+      # このステップの後、他のジョブ（ビルド、テストなど）が実行できます
