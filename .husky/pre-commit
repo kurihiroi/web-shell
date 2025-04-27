@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Check for unstaged changes
 if [ -n "$(git diff --name-only)" ]; then
   echo "❌ Error: There are unstaged changes. Please stage all changes before committing."
