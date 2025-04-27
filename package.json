@@ -14,7 +14,10 @@
     "check": "biome check .",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "firebase:dev": "firebase emulators:start"
+    "firebase:dev": "firebase emulators:start",
+    "prepare": "husky",
+    "lint-staged": "lint-staged",
+    "pre-commit": "lint-staged && pnpm lint && pnpm build"
   },
   "keywords": ["firebase", "web-shell", "turborepo", "vite", "react"],
   "author": "",
@@ -22,6 +25,8 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "firebase-tools": "^14.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
     "turbo": "^2.5.2"
   }
 }
