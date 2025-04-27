@@ -54,10 +54,11 @@ jobs:
             exit 1
           fi
           
-          # 確認のために変数の状態を出力（APIキーは一部マスク）
-          echo "Firebase API Key: ${FIREBASE_API_KEY:0:5}..."
+          # 確認のために変数の状態を出力
+          echo "Firebase API Key: （安全のため非表示）"
           echo "Firebase Auth Domain: $FIREBASE_AUTH_DOMAIN"
           echo "Firebase Project ID: $FIREBASE_PROJECT_ID"
+          echo "Firebase variables set: $([[ -n "$FIREBASE_API_KEY" && -n "$FIREBASE_AUTH_DOMAIN" && -n "$FIREBASE_PROJECT_ID" ]] && echo "YES" || echo "NO")"
           
       - name: Create Firebase Environment
         env:
