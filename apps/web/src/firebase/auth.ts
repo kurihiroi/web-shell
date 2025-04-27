@@ -13,49 +13,10 @@ import { auth } from './config';
 // Google認証プロバイダーの作成
 const googleProvider = new GoogleAuthProvider();
 
-// 現在のドメインとFirebase Auth Domainが一致するかチェック
-const shouldUseRedirect = (): boolean => {
+// リダイレクト認証を使用
+export const signInWithGoogleRedirect = async () => {
   try {
-    const currentDomain = window.location.hostname;
-    const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN?.split('.')[0] || '';
-    
-    // 開発環境ではlocalhostなので、リダイレクトを使用
-    if (currentDomain === 'localhost') {
-      return true;
-    }
-    
-    // 現在のドメイン名がFirebase Auth Domainと一致するかチェック
-    const currentDomainBase = currentDomain.split('.')[0];
-    return currentDomainBase === authDomain;
-  } catch (error) {
-    console.error('Error checking domain:', error);
-    // エラー時はポップアップにフォールバック
-    return false;
-  }
-};
-
-// Googleプロバイダーでのサインイン（ドメインに基づいて方法を選択）
-export const signInWithGoogle = async () => {
-  try {
-    if (shouldUseRedirect()) {
-      // リダイレクト認証（同一ドメインの場合）
-      console.log('Using redirect authentication');
-      await signInWithRedirect(auth, googleProvider);
-    } else {
-      // ポップアップ認証（異なるドメインの場合）
-      console.log('Using popup authentication');
-      return await signInWithPopup(auth, googleProvider);
-    }
-  } catch (error) {
-    console.error('Google sign-in error:', error);
-    throw error;
-  }
-};
-
-// 明示的にリダイレクト認証を使用
-export const signInWithGoogleRedirectExplicitly = async () => {
-  try {
-    console.log('Explicitly using redirect authentication');
+    console.log('Using redirect authentication');
     await signInWithRedirect(auth, googleProvider);
   } catch (error) {
     console.error('Google redirect sign-in error:', error);
@@ -63,10 +24,10 @@ export const signInWithGoogleRedirectExplicitly = async () => {
   }
 };
 
-// 明示的にポップアップ認証を使用
-export const signInWithGooglePopupExplicitly = async () => {
+// ポップアップ認証を使用
+export const signInWithGooglePopup = async () => {
   try {
-    console.log('Explicitly using popup authentication');
+    console.log('Using popup authentication');
     return await signInWithPopup(auth, googleProvider);
   } catch (error) {
     console.error('Google popup sign-in error:', error);

@@ -11,8 +11,7 @@ export default function GoogleSignInButton({
   text = 'Sign in with Google',
   className = '',
 }: GoogleSignInButtonProps): ReactElement {
-  const { signInWithGoogleRedirect, signInWithGooglePopup, signInWithGoogleAuto, loading } = useAuth();
-  const [authMethod, setAuthMethod] = useState<string>('checking...');
+  const { signInWithGoogleRedirect, signInWithGooglePopup, loading } = useAuth();
   const [envStatus, setEnvStatus] = useState<{ isSet: boolean; message: string }>({
     isSet: false,
     message: 'Checking environment...'
@@ -31,36 +30,6 @@ export default function GoogleSignInButton({
     });
   }, []);
 
-  // 現在のドメインとFirebase Auth Domainが一致するかチェック
-  useEffect(() => {
-    try {
-      const currentDomain = window.location.hostname;
-      const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN?.split('.')[0] || '';
-      
-      if (!authDomain) {
-        setAuthMethod('popup (fallback - missing auth domain)');
-        return;
-      }
-      
-      if (currentDomain === 'localhost') {
-        setAuthMethod('redirect (localhost)');
-        return;
-      }
-      
-      const currentDomainBase = currentDomain.split('.')[0];
-      const domainsMatch = currentDomainBase === authDomain;
-      
-      if (domainsMatch) {
-        setAuthMethod(`redirect (${currentDomain} matches ${authDomain})`);
-      } else {
-        setAuthMethod(`popup (${currentDomain} ≠ ${authDomain})`);
-      }
-    } catch (error) {
-      console.error('Error checking domain:', error);
-      setAuthMethod('popup (fallback - error)');
-    }
-  }, []);
-
   const handleRedirectSignIn = async () => {
     try {
       await signInWithGoogleRedirect();
@@ -74,14 +43,6 @@ export default function GoogleSignInButton({
       await signInWithGooglePopup();
     } catch (error) {
       console.error('Error signing in with Google (popup):', error);
-    }
-  };
-
-  const handleAutoSignIn = async () => {
-    try {
-      await signInWithGoogleAuto();
-    } catch (error) {
-      console.error('Error signing in with Google (auto):', error);
     }
   };
 
@@ -104,24 +65,19 @@ export default function GoogleSignInButton({
         >
           {loading ? 'Loading...' : `${text} (Popup)`}
         </button>
-        <button
-          onClick={handleAutoSignIn}
-          disabled={loading}
-          className={`google-sign-in-button ${className}`}
-          type="button"
-        >
-          {loading ? 'Loading...' : `${text} (Auto)`}
-        </button>
       </div>
-      <div className="auth-method-indicator">
-        Recommended method: {authMethod}
-      </div>
-      <div className="env-status-indicator" style={{ 
-        color: envStatus.isSet ? 'green' : 'red',
-        fontSize: '0.8rem',
-        marginTop: '0.5rem' 
-      }}>
-        {envStatus.message}
+      <div className="auth-info">
+        <p className="auth-description">
+          <strong>Redirect</strong>: ページ全体を切り替えて認証します。同一ドメインでの利用に最適。<br />
+          <strong>Popup</strong>: 小さなウィンドウで認証します。クロスドメインでも利用可能。
+        </p>
+        <div className="env-status-indicator" style={{ 
+          color: envStatus.isSet ? 'green' : 'red',
+          fontSize: '0.8rem',
+          marginTop: '0.5rem' 
+        }}>
+          {envStatus.message}
+        </div>
       </div>
     </div>
   );

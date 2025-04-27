@@ -2,9 +2,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import type { User } from 'firebase/auth';
 import {
   subscribeToAuthChanges,
-  signInWithGoogle,
-  signInWithGoogleRedirectExplicitly,
-  signInWithGooglePopupExplicitly,
+  signInWithGoogleRedirect,
+  signInWithGooglePopup,
   logOut,
   getAuthRedirectResult
 } from '../firebase/auth';
@@ -15,7 +14,6 @@ interface AuthContextType {
   error: Error | null;
   signInWithGoogleRedirect: () => Promise<void>;
   signInWithGooglePopup: () => Promise<void>;
-  signInWithGoogleAuto: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -68,18 +66,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  // 環境に応じて自動的に認証方法を選択
-  const signInWithGoogleAuto = async () => {
+  // リダイレクト認証を使用
+  const signInWithGoogleRedirectImpl = async () => {
     setLoading(true);
     setError(null);
     try {
-      // signInWithGoogle関数は環境に応じてリダイレクトかポップアップを使用
-      const result = await signInWithGoogle();
-      // ポップアップ認証の場合は結果が直接返される
-      if (result?.user) {
-        setCurrentUser(result.user);
-        setLoading(false);
-      }
+      await signInWithGoogleRedirect();
       // リダイレクト認証の場合は結果はnullとなり、リダイレクト後に処理される
     } catch (error) {
       setError(error as Error);
@@ -88,26 +80,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // 明示的にリダイレクト認証を使用
-  const signInWithGoogleRedirect = async () => {
+  // ポップアップ認証を使用
+  const signInWithGooglePopupImpl = async () => {
     setLoading(true);
     setError(null);
     try {
-      await signInWithGoogleRedirectExplicitly();
-      // リダイレクト認証の場合は結果はnullとなり、リダイレクト後に処理される
-    } catch (error) {
-      setError(error as Error);
-      setLoading(false);
-      throw error;
-    }
-  };
-
-  // 明示的にポップアップ認証を使用
-  const signInWithGooglePopup = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await signInWithGooglePopupExplicitly();
+      const result = await signInWithGooglePopup();
       if (result?.user) {
         setCurrentUser(result.user);
       }
@@ -138,9 +116,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     currentUser,
     loading,
     error,
-    signInWithGoogleRedirect,
-    signInWithGooglePopup,
-    signInWithGoogleAuto,
+    signInWithGoogleRedirect: signInWithGoogleRedirectImpl,
+    signInWithGooglePopup: signInWithGooglePopupImpl,
     logout
   };
 
