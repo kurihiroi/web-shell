@@ -35,6 +35,16 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .google-sign-in-button {
@@ -49,6 +59,8 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .google-sign-in-button:hover {

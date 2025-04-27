@@ -52,6 +52,28 @@ export const signInWithGoogle = async () => {
   }
 };
 
+// 明示的にリダイレクト認証を使用
+export const signInWithGoogleRedirectExplicitly = async () => {
+  try {
+    console.log('Explicitly using redirect authentication');
+    await signInWithRedirect(auth, googleProvider);
+  } catch (error) {
+    console.error('Google redirect sign-in error:', error);
+    throw error;
+  }
+};
+
+// 明示的にポップアップ認証を使用
+export const signInWithGooglePopupExplicitly = async () => {
+  try {
+    console.log('Explicitly using popup authentication');
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    console.error('Google popup sign-in error:', error);
+    throw error;
+  }
+};
+
 // リダイレクト結果の取得
 export const getAuthRedirectResult = async () => {
   try {

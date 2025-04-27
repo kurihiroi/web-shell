@@ -11,7 +11,7 @@ export default function GoogleSignInButton({
   text = 'Sign in with Google',
   className = '',
 }: GoogleSignInButtonProps): ReactElement {
-  const { signInWithGoogleRedirect, loading } = useAuth();
+  const { signInWithGoogleRedirect, signInWithGooglePopup, signInWithGoogleAuto, loading } = useAuth();
   const [authMethod, setAuthMethod] = useState<string>('checking...');
   const [envStatus, setEnvStatus] = useState<{ isSet: boolean; message: string }>({
     isSet: false,
@@ -61,26 +61,60 @@ export default function GoogleSignInButton({
     }
   }, []);
 
-  const handleSignIn = async () => {
+  const handleRedirectSignIn = async () => {
     try {
       await signInWithGoogleRedirect();
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('Error signing in with Google (redirect):', error);
+    }
+  };
+
+  const handlePopupSignIn = async () => {
+    try {
+      await signInWithGooglePopup();
+    } catch (error) {
+      console.error('Error signing in with Google (popup):', error);
+    }
+  };
+
+  const handleAutoSignIn = async () => {
+    try {
+      await signInWithGoogleAuto();
+    } catch (error) {
+      console.error('Error signing in with Google (auto):', error);
     }
   };
 
   return (
     <div className="google-auth-container">
-      <button
-        onClick={handleSignIn}
-        disabled={loading}
-        className={`google-sign-in-button ${className}`}
-        type="button"
-      >
-        {loading ? 'Loading...' : text}
-      </button>
+      <div className="auth-buttons">
+        <button
+          onClick={handleRedirectSignIn}
+          disabled={loading}
+          className={`google-sign-in-button ${className}`}
+          type="button"
+        >
+          {loading ? 'Loading...' : `${text} (Redirect)`}
+        </button>
+        <button
+          onClick={handlePopupSignIn}
+          disabled={loading}
+          className={`google-sign-in-button ${className}`}
+          type="button"
+        >
+          {loading ? 'Loading...' : `${text} (Popup)`}
+        </button>
+        <button
+          onClick={handleAutoSignIn}
+          disabled={loading}
+          className={`google-sign-in-button ${className}`}
+          type="button"
+        >
+          {loading ? 'Loading...' : `${text} (Auto)`}
+        </button>
+      </div>
       <div className="auth-method-indicator">
-        Using {authMethod} authentication
+        Recommended method: {authMethod}
       </div>
       <div className="env-status-indicator" style={{ 
         color: envStatus.isSet ? 'green' : 'red',
