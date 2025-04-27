@@ -1,0 +1,11 @@
+# Check for unstaged changes
+if [ -n "$(git diff --name-only)" ]; then
+  echo "❌ Error: There are unstaged changes. Please stage all changes before committing."
+  echo "Files with unstaged changes:"
+  git diff --name-only
+  exit 1
+fi
+
+# Run pre-commit checks (lint-staged, lint, build)
+echo "🔍 Running pre-commit checks..."
+pnpm pre-commit
