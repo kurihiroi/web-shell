@@ -1,6 +1,6 @@
 module.exports = {
   // Biomeによるフォーマットとリント
-  '**/*.{js,jsx,ts,tsx}': ['biome check --apply', 'biome format --write'],
+  '**/*.{js,jsx,ts,tsx}': ['biome check --write', 'biome format --write'],
 
   // CSSファイルはformatのみ
   '**/*.css': ['biome format --write'],
