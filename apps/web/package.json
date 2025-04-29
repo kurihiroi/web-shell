@@ -13,6 +13,7 @@
     "clean": "rm -rf .turbo node_modules dist"
   },
   "dependencies": {
+    "@web-shell/firestore-generator": "workspace:*",
     "firebase": "^11.6.1",
     "ramda": "^0.30.1",
     "react": "^19.1.0",
