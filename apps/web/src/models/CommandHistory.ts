@@ -12,6 +12,6 @@ export const CommandSchema = z.object({
 
 export type Command = z.infer<typeof CommandSchema>;
 
-// web-shell データベースの "histories/requests" パスに対応するコレクション名
-// getFirestore(app, 'web-shell')でデータベース名を指定しているため、プレフィックスは不要
-export const COMMAND_HISTORY_COLLECTION = 'histories/requests';
+// Firestoreのコレクションパスは奇数セグメントである必要がある
+// histories/requests_eventsのように、偶数セグメントはエラーとなる
+export const COMMAND_HISTORY_COLLECTION = 'command_history';
