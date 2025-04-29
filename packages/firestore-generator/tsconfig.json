@@ -11,8 +11,10 @@
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
 
     /* Output */
     "declaration": true,
@@ -30,5 +32,5 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

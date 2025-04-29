@@ -1,43 +1,32 @@
+// 修正済み：@web-shell/firestore-generatorからのインポート
+import {
+  type EventSourcedRepository,
+  type EventDocument as FirestoreEventDocument,
+  createEventSourcedRepository,
+} from '@web-shell/firestore-generator';
 import type { Firestore } from 'firebase/firestore';
 import type { z } from 'zod';
 import { COMMAND_HISTORY_COLLECTION, CommandSchema } from '../models/CommandHistory';
 
-// TODO: @web-shell/firestore-generator パッケージの修正が必要
-// import { createEventSourcedRepository } from '@web-shell/firestore-generator';
-
-// 型定義
-type EventDocument<T> = {
-  id: string;
-  entityId: string;
-  data: T;
-  serverTimestamp: Date | null;
-  clientTimestamp: Date;
-};
-
-type EventSourcedRepository<T> = {
-  create: (data: T) => Promise<string>;
-  findById: (
-    id: string
-  ) => Promise<(T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null }) | null>;
-  findAll: () => Promise<
-    Array<T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null }>
-  >;
-  update: (id: string, changes: Partial<T>) => Promise<void>;
-  delete: (id: string) => Promise<void>;
-  getHistory: (id: string) => Promise<EventDocument<unknown>[]>;
+// Commandの型をより厳密に定義（statusはundefinedを許容しない）
+type StrictCommand = {
+  command: string;
+  status: 'success' | 'error' | 'pending';
+  timestamp?: Date;
+  userId?: string;
+  output?: string;
+  workingDirectory?: string;
+  environment?: Record<string, string>;
 };
 
 // 開発用インメモリストレージ（アプリケーション全体で共有）
 const inMemoryStorage: Record<string, Array<unknown>> = {};
 
-// 一時的に仮実装
-const createEventSourcedRepository = <T>(
-  _db: Firestore,
+// 開発用のインメモリ実装を作成
+const createInMemoryRepository = <T>(
   collection: string,
-  _schema: z.ZodType<T>
+  schema: z.ZodType<T>
 ): EventSourcedRepository<T> => {
-  // インメモリモードでの仮実装
-
   // コレクションごとのストレージを初期化（存在しない場合）
   if (!inMemoryStorage[collection]) {
     inMemoryStorage[collection] = [];
@@ -50,7 +39,10 @@ const createEventSourcedRepository = <T>(
 
   return {
     create: async (data: T) => {
-      console.log('Creating document in collection', collection, data);
+      console.log('[InMemory] Creating document in collection', collection, data);
+      // 入力データのバリデーション
+      schema.parse(data);
+
       const id = `dummy-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       // メモリ内データを更新
@@ -66,44 +58,38 @@ const createEventSourcedRepository = <T>(
       return id;
     },
     findById: async (id: string) => {
-      console.log('Finding document by ID', id);
+      console.log('[InMemory] Finding document by ID', id);
       return items.find((item) => item.id === id) || null;
     },
     findAll: async () => {
-      console.log('Finding all documents');
+      console.log('[InMemory] Finding all documents');
       // データをクローンして返す（参照を避けるため）
       return [...items];
     },
     update: async (id: string, changes: Partial<T>) => {
-      console.log('Updating document', id, changes);
+      console.log('[InMemory] Updating document', id, changes);
       const index = items.findIndex((item) => item.id === id);
       if (index !== -1) {
         items[index] = { ...items[index], ...changes };
+      } else {
+        throw new Error(`Entity with ID ${id} not found`);
       }
     },
     delete: async (id: string) => {
-      console.log('Deleting document', id);
+      console.log('[InMemory] Deleting document', id);
       const index = items.findIndex((item) => item.id === id);
       if (index !== -1) {
         items.splice(index, 1);
+      } else {
+        throw new Error(`Entity with ID ${id} not found`);
       }
     },
     getHistory: async (id: string) => {
-      console.log('Getting history for document', id);
-      return [];
+      console.log('[InMemory] Getting history for document', id);
+      // インメモリ実装ではイベント履歴は保持していないので空配列を返す
+      return [] as FirestoreEventDocument<unknown>[];
     },
   };
-};
-
-// Commandの型をより厳密に定義（statusはundefinedを許容しない）
-type StrictCommand = {
-  command: string;
-  status: 'success' | 'error' | 'pending';
-  timestamp?: Date;
-  userId?: string;
-  output?: string;
-  workingDirectory?: string;
-  environment?: Record<string, string>;
 };
 
 // シングルトンインスタンスを保持（複数回呼び出しでもインメモリキャッシュを共有するため）
@@ -112,12 +98,11 @@ let repositoryInstance: EventSourcedRepository<StrictCommand> | null = null;
 // コマンド履歴のリポジトリを作成する関数
 export const createCommandHistoryRepository = (db: Firestore | null) => {
   if (!db) {
-    console.warn('Firestore is not initialized, creating dummy repository');
+    console.warn('Firestore is not initialized, creating in-memory repository');
     // キャッシュがあれば再利用し、なければ新しいレポジトリを作成
     if (!repositoryInstance) {
       // CommandSchema から作成するが、内部では StrictCommand として扱う
-      repositoryInstance = createEventSourcedRepository(
-        null as unknown as Firestore,
+      repositoryInstance = createInMemoryRepository(
         COMMAND_HISTORY_COLLECTION,
         CommandSchema
       ) as unknown as EventSourcedRepository<StrictCommand>;
