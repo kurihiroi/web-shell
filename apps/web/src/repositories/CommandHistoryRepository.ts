@@ -33,24 +33,50 @@ const createEventSourcedRepository = <T>(
   collection: string,
   _schema: z.ZodType<T>
 ): EventSourcedRepository<T> => {
+  // インメモリモードでの仮実装
+
+  // インメモリキャッシュ（開発用）
+  const items: Array<T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null }> = [];
+
   return {
     create: async (data: T) => {
       console.log('Creating document in collection', collection, data);
-      return 'dummy-id';
+      const id = `dummy-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+      // メモリ内データを更新
+      const newItem = {
+        ...data,
+        id,
+        clientTimestamp: new Date(),
+        serverTimestamp: null,
+      } as T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null };
+
+      items.push(newItem);
+
+      return id;
     },
     findById: async (id: string) => {
       console.log('Finding document by ID', id);
-      return null;
+      return items.find((item) => item.id === id) || null;
     },
     findAll: async () => {
       console.log('Finding all documents');
-      return [];
+      // データをクローンして返す（参照を避けるため）
+      return [...items];
     },
     update: async (id: string, changes: Partial<T>) => {
       console.log('Updating document', id, changes);
+      const index = items.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        items[index] = { ...items[index], ...changes };
+      }
     },
     delete: async (id: string) => {
       console.log('Deleting document', id);
+      const index = items.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        items.splice(index, 1);
+      }
     },
     getHistory: async (id: string) => {
       console.log('Getting history for document', id);
