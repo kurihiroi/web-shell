@@ -31,6 +31,7 @@ export async function createEvent<T, E extends EventType>(
   metadata?: Record<string, unknown>
 ): Promise<string> {
   const eventDoc = {
+    id: '', // Will be set by Firestore
     entityId,
     type,
     data,
