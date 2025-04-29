@@ -60,6 +60,17 @@ const createEventSourcedRepository = <T>(
 };
 
 // コマンド履歴のリポジトリを作成する関数
-export const createCommandHistoryRepository = (db: Firestore) => {
+export const createCommandHistoryRepository = (db: Firestore | null) => {
+  if (!db) {
+    console.warn('Firestore is not initialized, creating dummy repository');
+    return {
+      create: async () => 'dummy-id',
+      findById: async () => null,
+      findAll: async () => [],
+      update: async () => {},
+      delete: async () => {},
+      getHistory: async () => [],
+    };
+  }
   return createEventSourcedRepository(db, COMMAND_HISTORY_COLLECTION, CommandSchema);
 };

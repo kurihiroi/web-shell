@@ -17,7 +17,7 @@ export default function Shell() {
   // コマンド履歴を取得
   useEffect(() => {
     const fetchCommandHistory = async () => {
-      if (!user) return;
+      if (!user || !db) return;
 
       try {
         const history = await commandRepo.findAll();
@@ -44,7 +44,12 @@ export default function Shell() {
       }
     };
 
-    fetchCommandHistory();
+    // Firestoreが利用可能な場合のみ履歴を取得
+    if (db) {
+      fetchCommandHistory();
+    } else {
+      console.warn('Firestore is not available. Command history will not be loaded.');
+    }
   }, [user, commandRepo]);
 
   // コマンドを実行
@@ -75,11 +80,19 @@ export default function Shell() {
       newCommand.status = 'success';
       newCommand.output = dummyOutput;
 
-      // Firestoreに保存
-      if (user) {
-        await commandRepo.create(newCommand);
-
-        // 履歴を更新
+      // Firestoreに保存（利用可能な場合のみ）
+      if (user && db) {
+        try {
+          await commandRepo.create(newCommand);
+          // 履歴を更新
+          setCommandHistory((prev) => [newCommand, ...prev]);
+        } catch (dbError) {
+          console.error('Failed to save command to Firestore:', dbError);
+          // データベースエラーでもローカル履歴には追加
+          setCommandHistory((prev) => [newCommand, ...prev]);
+        }
+      } else {
+        // データベースが利用できなくてもUIには表示
         setCommandHistory((prev) => [newCommand, ...prev]);
       }
     } catch (error) {
@@ -92,10 +105,17 @@ export default function Shell() {
       newCommand.status = 'error';
       newCommand.output = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
 
-      // エラー状態もFirestoreに保存
-      if (user) {
-        await commandRepo.create(newCommand);
+      // エラー状態もFirestoreに保存（利用可能な場合のみ）
+      if (user && db) {
+        try {
+          await commandRepo.create(newCommand);
+        } catch (dbError) {
+          console.error('Failed to save error command to Firestore:', dbError);
+        }
       }
+
+      // データベースが利用できなくてもUIには表示
+      setCommandHistory((prev) => [newCommand, ...prev]);
     } finally {
       setCommand('');
       setIsProcessing(false);
