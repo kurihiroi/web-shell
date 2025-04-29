@@ -60,17 +60,36 @@ export function createConverter<T>(
       const data = snapshot.data(options);
 
       // Convert Firestore Timestamps to Dates
+      /* biome-ignore lint/suspicious/noExplicitAny: timestamp conversion needs to handle any type */
+      const convertTimestamps = (obj: any): any => {
+        if (obj === null || obj === undefined) {
+          return obj;
+        }
+
+        if (obj instanceof Timestamp) {
+          return timestampToDate(obj);
+        }
+
+        if (typeof obj === 'object') {
+          /* biome-ignore lint/suspicious/noExplicitAny: generic container for diverse types */
+          const result: any = Array.isArray(obj) ? [] : {};
+
+          for (const key in obj) {
+            result[key] = convertTimestamps(obj[key]);
+          }
+
+          return result;
+        }
+
+        return obj;
+      };
+
+      // Process all data to convert timestamps
+      const processedData = convertTimestamps(data) as DocumentData;
+
       const cleanedData = {
-        ...data,
+        ...processedData,
         id: snapshot.id,
-        serverTimestamp:
-          data.serverTimestamp instanceof Timestamp
-            ? timestampToDate(data.serverTimestamp)
-            : data.serverTimestamp,
-        clientTimestamp:
-          data.clientTimestamp instanceof Timestamp
-            ? timestampToDate(data.clientTimestamp)
-            : data.clientTimestamp,
       };
 
       try {
@@ -125,18 +144,38 @@ export function createEventConverter<T, E extends EventType = EventType>(
     ): EventDocument<T, E> {
       const data = snapshot.data(options);
 
-      // Convert Firestore Timestamps to Dates
+      // Convert Firestore Timestamps to Dates and handle potential nested timestamps in data
+      /* biome-ignore lint/suspicious/noExplicitAny: timestamp conversion needs to handle any type */
+      const convertTimestamps = (obj: any): any => {
+        if (obj === null || obj === undefined) {
+          return obj;
+        }
+
+        if (obj instanceof Timestamp) {
+          return timestampToDate(obj);
+        }
+
+        if (typeof obj === 'object') {
+          /* biome-ignore lint/suspicious/noExplicitAny: generic container for diverse types */
+          const result: any = Array.isArray(obj) ? [] : {};
+
+          for (const key in obj) {
+            result[key] = convertTimestamps(obj[key]);
+          }
+
+          return result;
+        }
+
+        return obj;
+      };
+
+      // Apply timestamp conversion to entire data object
+      const processedData = convertTimestamps(data) as DocumentData;
+
+      // First convert top-level timestamps
       const cleanedData = {
-        ...data,
+        ...processedData,
         id: snapshot.id,
-        serverTimestamp:
-          data.serverTimestamp instanceof Timestamp
-            ? timestampToDate(data.serverTimestamp)
-            : data.serverTimestamp,
-        clientTimestamp:
-          data.clientTimestamp instanceof Timestamp
-            ? timestampToDate(data.clientTimestamp)
-            : data.clientTimestamp,
       };
 
       try {
