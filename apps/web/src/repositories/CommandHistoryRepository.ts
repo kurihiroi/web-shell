@@ -27,6 +27,9 @@ type EventSourcedRepository<T> = {
   getHistory: (id: string) => Promise<EventDocument<unknown>[]>;
 };
 
+// 開発用インメモリストレージ（アプリケーション全体で共有）
+const inMemoryStorage: Record<string, Array<unknown>> = {};
+
 // 一時的に仮実装
 const createEventSourcedRepository = <T>(
   _db: Firestore,
@@ -35,8 +38,15 @@ const createEventSourcedRepository = <T>(
 ): EventSourcedRepository<T> => {
   // インメモリモードでの仮実装
 
-  // インメモリキャッシュ（開発用）
-  const items: Array<T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null }> = [];
+  // コレクションごとのストレージを初期化（存在しない場合）
+  if (!inMemoryStorage[collection]) {
+    inMemoryStorage[collection] = [];
+  }
+
+  // この特定のコレクションのデータへの参照
+  const items = inMemoryStorage[collection] as Array<
+    T & { id: string; clientTimestamp: Date; serverTimestamp: Date | null }
+  >;
 
   return {
     create: async (data: T) => {
@@ -85,18 +95,45 @@ const createEventSourcedRepository = <T>(
   };
 };
 
+// Commandの型をより厳密に定義（statusはundefinedを許容しない）
+type StrictCommand = {
+  command: string;
+  status: 'success' | 'error' | 'pending';
+  timestamp?: Date;
+  userId?: string;
+  output?: string;
+  workingDirectory?: string;
+  environment?: Record<string, string>;
+};
+
+// シングルトンインスタンスを保持（複数回呼び出しでもインメモリキャッシュを共有するため）
+let repositoryInstance: EventSourcedRepository<StrictCommand> | null = null;
+
 // コマンド履歴のリポジトリを作成する関数
 export const createCommandHistoryRepository = (db: Firestore | null) => {
   if (!db) {
     console.warn('Firestore is not initialized, creating dummy repository');
-    return {
-      create: async () => 'dummy-id',
-      findById: async () => null,
-      findAll: async () => [],
-      update: async () => {},
-      delete: async () => {},
-      getHistory: async () => [],
-    };
+    // キャッシュがあれば再利用し、なければ新しいレポジトリを作成
+    if (!repositoryInstance) {
+      // CommandSchema から作成するが、内部では StrictCommand として扱う
+      repositoryInstance = createEventSourcedRepository(
+        null as unknown as Firestore,
+        COMMAND_HISTORY_COLLECTION,
+        CommandSchema
+      ) as unknown as EventSourcedRepository<StrictCommand>;
+    }
+    return repositoryInstance;
   }
-  return createEventSourcedRepository(db, COMMAND_HISTORY_COLLECTION, CommandSchema);
+
+  // 既存のインスタンスがあれば再利用
+  if (!repositoryInstance) {
+    // CommandSchema から作成するが、内部では StrictCommand として扱う
+    repositoryInstance = createEventSourcedRepository(
+      db,
+      COMMAND_HISTORY_COLLECTION,
+      CommandSchema
+    ) as unknown as EventSourcedRepository<StrictCommand>;
+  }
+
+  return repositoryInstance;
 };

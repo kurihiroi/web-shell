@@ -12,7 +12,9 @@ export default function Shell() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { user } = useAuth();
-  const commandRepo = createCommandHistoryRepository(db);
+  const commandRepo = createCommandHistoryRepository(db) as NonNullable<
+    ReturnType<typeof createCommandHistoryRepository>
+  >;
 
   // コマンド履歴を取得
   useEffect(() => {
