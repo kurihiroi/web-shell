@@ -17,7 +17,7 @@
     "firebase:dev": "firebase emulators:start",
     "prepare": "husky",
     "lint-staged": "lint-staged",
-    "pre-commit": "lint-staged && pnpm lint && pnpm build"
+    "pre-commit": "lint-staged && pnpm lint && pnpm build && pnpm test"
   },
   "keywords": ["firebase", "web-shell", "turborepo", "vite", "react"],
   "author": "",

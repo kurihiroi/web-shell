@@ -1,3 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
 # Check for unstaged changes
 if [ -n "$(git diff --name-only)" ]; then
   echo "❌ Error: There are unstaged changes. Please stage all changes before committing."
@@ -6,6 +9,6 @@ if [ -n "$(git diff --name-only)" ]; then
   exit 1
 fi
 
-# Run pre-commit checks (lint-staged, lint, build)
-echo "🔍 Running pre-commit checks..."
+# Run pre-commit checks (lint-staged, lint, build, and tests)
+echo "🔍 Running pre-commit checks (lint, build, and tests)..."
 pnpm pre-commit
