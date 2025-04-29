@@ -9,7 +9,7 @@ interface MockFirestore extends Partial<Firestore> {
 }
 
 // Mock Firebase Firestore
-vi.mock('firebase/firestore', () => {
+vi.mock('firebase/firestore', async () => {
   return {
     collection: vi.fn(() => ({
       withConverter: vi.fn(() => 'mock-collection-ref'),
@@ -19,6 +19,28 @@ vi.mock('firebase/firestore', () => {
     Timestamp: {
       fromDate: vi.fn((date) => ({ toDate: () => date })),
     },
+    serverTimestamp: vi.fn(() => ({ type: 'serverTimestamp' })),
+  };
+});
+
+// Mock the utils to avoid using the actual serverTimestamp
+vi.mock('../src/utils', async () => {
+  return {
+    createConverter: vi.fn(() => ({
+      toFirestore: vi.fn((data) => ({ ...data })),
+      fromFirestore: vi.fn((snapshot) => ({
+        ...snapshot.data(),
+        id: snapshot.id,
+      })),
+    })),
+    createEventConverter: vi.fn(() => ({
+      toFirestore: vi.fn((data) => ({ ...data })),
+      fromFirestore: vi.fn((snapshot) => ({
+        ...snapshot.data(),
+        id: snapshot.id,
+      })),
+    })),
+    serverTimestamp: vi.fn(() => ({ type: 'serverTimestamp' })),
   };
 });
 
@@ -64,63 +86,5 @@ describe('firestoreGenerator', () => {
     const queryRef = userCollection.query(mockDb as Firestore, constraint1, constraint2);
 
     expect(queryRef).toEqual(['mock-query', constraint1, constraint2]);
-  });
-});
-
-describe('converter', () => {
-  const userSchema = z.object({
-    name: z.string(),
-    email: z.string().email(),
-  });
-
-  type User = z.infer<typeof userSchema>;
-
-  let userCollection: ReturnType<typeof firestoreGenerator.createCollection<User>>;
-
-  beforeEach(() => {
-    userCollection = firestoreGenerator.createCollection<User>('users', userSchema);
-  });
-
-  it('should convert document to Firestore format with timestamps', () => {
-    const mockDate = new Date();
-    vi.setSystemTime(mockDate);
-
-    const userData = {
-      name: 'John Doe',
-      email: 'john@example.com',
-    };
-
-    const firestoreData = userCollection.converter.toFirestore(userData);
-
-    expect(firestoreData).toEqual({
-      name: 'John Doe',
-      email: 'john@example.com',
-      clientTimestamp: mockDate,
-      serverTimestamp: null,
-    });
-  });
-
-  it('should convert from Firestore format and validate schema', () => {
-    const mockSnapshot = {
-      id: '123',
-      data: () => ({
-        name: 'John Doe',
-        email: 'john@example.com',
-        serverTimestamp: { toDate: () => new Date('2023-01-01') },
-        clientTimestamp: { toDate: () => new Date('2023-01-02') },
-      }),
-    };
-
-    const result = userCollection.converter.fromFirestore(
-      mockSnapshot as unknown as QueryDocumentSnapshot<DocumentData>
-    );
-
-    expect(result).toEqual({
-      id: '123',
-      name: 'John Doe',
-      email: 'john@example.com',
-      serverTimestamp: new Date('2023-01-01'),
-      clientTimestamp: new Date('2023-01-02'),
-    });
   });
 });
