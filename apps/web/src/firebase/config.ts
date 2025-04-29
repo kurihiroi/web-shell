@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -63,5 +63,17 @@ try {
 }
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Firestoreを初期化（web-shellデータベースを指定）
+export const db = getFirestore(app, 'web-shell');
+
+// ローカル環境では Firebase Emulator に接続する
+if (import.meta.env.DEV) {
+  // Firestore emulator は通常 8080 ポートで実行される
+  connectFirestoreEmulator(db, 'localhost', 8080);
+  console.log('🔥 Connected to Firestore emulator on localhost:8080');
+} else {
+  console.log('🔥 Using Firestore with web-shell path prefix for database');
+}
+
 export default app;

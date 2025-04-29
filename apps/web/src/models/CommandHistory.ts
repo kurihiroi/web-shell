@@ -12,5 +12,6 @@ export const CommandSchema = z.object({
 
 export type Command = z.infer<typeof CommandSchema>;
 
-// "histories/requests" パスに対応するスキーマ名
+// web-shell データベースの "histories/requests" パスに対応するコレクション名
+// getFirestore(app, 'web-shell')でデータベース名を指定しているため、プレフィックスは不要
 export const COMMAND_HISTORY_COLLECTION = 'histories/requests';
