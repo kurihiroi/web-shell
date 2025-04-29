@@ -3,6 +3,7 @@ import type {
   DocumentData,
   DocumentReference,
   Firestore,
+  FirestoreDataConverter,
   Query,
   QueryConstraint,
   WithFieldValue,
@@ -23,10 +24,7 @@ export type FirestoreDocumentInput<T> = Omit<
 export interface FirestoreCollection<T> {
   collectionName: string;
   schema: z.ZodType<T>;
-  converter: {
-    toFirestore: (data: FirestoreDocumentInput<T>) => DocumentData;
-    fromFirestore: (snapshot: DocumentData) => FirestoreDocument<T>;
-  };
+  converter: FirestoreDataConverter<FirestoreDocument<T>>;
   ref: (db: Firestore) => CollectionReference<FirestoreDocument<T>>;
   doc: (db: Firestore, id: string) => DocumentReference<FirestoreDocument<T>>;
   query: (db: Firestore, ...constraints: QueryConstraint[]) => Query<FirestoreDocument<T>>;
@@ -71,10 +69,7 @@ export type EventDocumentInput<T, E extends EventType = EventType> = Omit<
 export interface EventCollection<T, E extends EventType = EventType> {
   collectionName: string;
   schema: z.ZodType<T>;
-  converter: {
-    toFirestore: (data: EventDocumentInput<T, E>) => DocumentData;
-    fromFirestore: (snapshot: DocumentData) => EventDocument<T, E>;
-  };
+  converter: FirestoreDataConverter<EventDocument<T, E>>;
   ref: (db: Firestore) => CollectionReference<EventDocument<T, E>>;
   doc: (db: Firestore, id: string) => DocumentReference<EventDocument<T, E>>;
   query: (db: Firestore, ...constraints: QueryConstraint[]) => Query<EventDocument<T, E>>;

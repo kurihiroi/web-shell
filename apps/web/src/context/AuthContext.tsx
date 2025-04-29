@@ -1,15 +1,16 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User } from 'firebase/auth';
+import { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import {
-  subscribeToAuthChanges,
-  signInWithGoogleRedirect,
-  signInWithGooglePopup,
+  getAuthRedirectResult,
   logOut,
-  getAuthRedirectResult
+  signInWithGooglePopup,
+  signInWithGoogleRedirect,
+  subscribeToAuthChanges,
 } from '../firebase/auth';
 
 interface AuthContextType {
   currentUser: User | null;
+  user: User | null; // エイリアスとしてuserも追加
   loading: boolean;
   error: Error | null;
   signInWithGoogleRedirect: () => Promise<void>;
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Subscribe to auth state changes
   useEffect(() => {
     const unsubscribe = subscribeToAuthChanges((user) => {
-      console.log('###subscribeToAuthChanges', user)
+      console.log('###subscribeToAuthChanges', user);
       setCurrentUser(user);
       setLoading(false);
     });
@@ -114,16 +115,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const value = {
     currentUser,
+    user: currentUser, // userをcurrentUserのエイリアスとして追加
     loading,
     error,
     signInWithGoogleRedirect: signInWithGoogleRedirectImpl,
     signInWithGooglePopup: signInWithGooglePopupImpl,
-    logout
+    logout,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

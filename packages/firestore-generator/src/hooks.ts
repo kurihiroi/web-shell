@@ -162,9 +162,13 @@ export function useEventSourcedCollection<T>(
             );
 
             const results = await Promise.all(entityPromises);
-            const validEntities = results.filter(
-              (entity): entity is FirestoreDocument<T> => entity !== null
-            );
+            // Filter out null values and cast to the expected type
+            const validEntities: FirestoreDocument<T>[] = [];
+            for (const entity of results) {
+              if (entity !== null) {
+                validEntities.push(entity);
+              }
+            }
 
             setEntities(validEntities);
             setLoading(false);
@@ -191,7 +195,16 @@ export function useEventSourcedCollection<T>(
   }, [collectionName, schema, constraints]);
 
   useEffect(() => {
-    const unsubscribe = refreshCollection();
+    const unsubscribePromise = refreshCollection();
+    let unsubscribe: (() => void) | undefined;
+
+    // Handle the promise properly
+    unsubscribePromise
+      .then((unsub) => {
+        unsubscribe = unsub;
+      })
+      .catch((err) => console.error('Error setting up unsubscribe:', err));
+
     return () => {
       if (unsubscribe) {
         unsubscribe();

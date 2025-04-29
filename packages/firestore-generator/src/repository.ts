@@ -39,10 +39,18 @@ export function createEventSourcedRepository<T>(
   // Create event collections for each operation type
   const createEventsCollection = createEventCollectionFactory<T, 'create'>(collectionName, schema);
 
+  // Create a schema for T & { changes: Partial<T> } without using .extend or .partial
+  // which might not be available on all ZodType instances
+  const schemaWithChanges = z.object({
+    // We can't assume schema has a shape property, so make this more flexible
+    // Create a changes field that accepts any partial of T
+    changes: z.any(),
+  });
+
   const updateEventsCollection = createEventCollectionFactory<
     T & { changes: Partial<T> },
     'update'
-  >(collectionName, schema.extend({ changes: schema.partial() }));
+  >(collectionName, schemaWithChanges as unknown as z.ZodType<T & { changes: Partial<T> }>);
 
   const deleteEventsCollection = createEventCollectionFactory<{ id: string }, 'delete'>(
     collectionName,

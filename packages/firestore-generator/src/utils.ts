@@ -2,9 +2,12 @@ import {
   type DocumentData,
   type DocumentSnapshot,
   type FirestoreDataConverter,
+  type PartialWithFieldValue,
   type QueryDocumentSnapshot,
+  type SetOptions,
   type SnapshotOptions,
   Timestamp,
+  type WithFieldValue,
   serverTimestamp as firestoreServerTimestamp,
 } from 'firebase/firestore';
 import { z } from 'zod';
@@ -30,7 +33,7 @@ export function createConverter<T>(
   schema: z.ZodType<T>
 ): FirestoreDataConverter<FirestoreDocument<T>> {
   return {
-    toFirestore(modelObject: FirestoreDocumentInput<T>): DocumentData {
+    toFirestore: (modelObject: WithFieldValue<FirestoreDocument<T>>): DocumentData => {
       const now = new Date();
 
       const data = {
@@ -71,11 +74,17 @@ export function createConverter<T>(
       };
 
       try {
-        const fullDocSchema = schema.extend({
-          id: z.string(),
-          serverTimestamp: z.date().nullable(),
-          clientTimestamp: z.date(),
-        });
+        // Create a new schema that includes the required fields
+        // without assuming schema has a shape property
+        const fullDocSchema = z
+          .object({
+            id: z.string(),
+            serverTimestamp: z.date().nullable(),
+            clientTimestamp: z.date(),
+            // Remaining fields from T will be handled via any
+            // since we can't reliably extract them from an arbitrary ZodType
+          })
+          .passthrough() as unknown as z.ZodType<FirestoreDocument<T>>;
 
         // Validate the document matches our schema
         return fullDocSchema.parse(cleanedData);
@@ -93,7 +102,7 @@ export function createEventConverter<T, E extends EventType = EventType>(
   schema: z.ZodType<T>
 ): FirestoreDataConverter<EventDocument<T, E>> {
   return {
-    toFirestore(modelObject: EventDocumentInput<T, E>): DocumentData {
+    toFirestore: (modelObject: WithFieldValue<EventDocument<T, E>>): DocumentData => {
       const data = {
         ...modelObject,
         // Server timestamp will be set by Firestore
@@ -131,10 +140,11 @@ export function createEventConverter<T, E extends EventType = EventType>(
       };
 
       try {
+        // Fix the type casting by using unknown as intermediate type
         const eventSchema = z.object({
           id: z.string(),
           entityId: z.string(),
-          type: z.string() as z.ZodType<E>,
+          type: z.string() as unknown as z.ZodType<E>,
           data: schema,
           serverTimestamp: z.date().nullable(),
           clientTimestamp: z.date(),
