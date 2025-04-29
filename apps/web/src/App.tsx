@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
 import './App.css';
-import { FormSchema } from './utils/validation';
-import { getPositiveNumbersSum, doubleAllNumbers } from './utils/helpers';
-import { AuthProvider } from './context/AuthContext';
 import AuthStatus from './components/Auth/AuthStatus';
+import Shell from './components/Shell/Shell';
+import { AuthProvider } from './context/AuthContext';
+import { doubleAllNumbers, getPositiveNumbersSum } from './utils/helpers';
+import { FormSchema } from './utils/validation';
 import './components/Auth/Auth.css';
 
 function App(): ReactElement {
@@ -25,7 +26,7 @@ function App(): ReactElement {
 
     const result = FormSchema.safeParse(formData);
     if (!result.success) {
-      const errors = result.error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
+      const errors = result.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
       setFormErrors(errors);
     } else {
       setFormErrors([]);
@@ -36,12 +37,12 @@ function App(): ReactElement {
   // Ramda examples
   const positiveSum = getPositiveNumbersSum(numbers);
   const doubledNumbers = doubleAllNumbers(numbers);
-  
+
   return (
     <AuthProvider>
       <div className="app">
         <h1>Web Shell</h1>
-        
+
         <div className="card">
           <button type="button" onClick={() => setCount((count) => count + 1)}>
             count is {count}
@@ -51,6 +52,11 @@ function App(): ReactElement {
         <div className="auth-example">
           <h3>Firebase Auth Example</h3>
           <AuthStatus />
+        </div>
+
+        <div className="shell-example">
+          <h3>Web Shell</h3>
+          <Shell />
         </div>
 
         <div className="ramda-example">
@@ -77,8 +83,7 @@ function App(): ReactElement {
             </div>
             <div>
               <label htmlFor="terms">
-                <input id="terms" name="terms" type="checkbox" />
-                I accept the terms
+                <input id="terms" name="terms" type="checkbox" />I accept the terms
               </label>
             </div>
             <button type="submit">Submit</button>

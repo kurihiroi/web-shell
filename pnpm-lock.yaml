@@ -26,6 +26,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@web-shell/firestore-generator':
+        specifier: workspace:*
+        version: link:../../packages/firestore-generator
       firebase:
         specifier: ^11.6.1
         version: 11.6.1

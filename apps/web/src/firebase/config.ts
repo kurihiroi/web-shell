@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -25,9 +26,8 @@ const envVars = [
 for (const key of envVars) {
   const value = import.meta.env[key];
   const status = value ? '✅ Set' : '❌ Missing';
-  const displayValue = key === 'VITE_FIREBASE_API_KEY' && value 
-    ? `${value.substring(0, 5)}...` 
-    : value;
+  const displayValue =
+    key === 'VITE_FIREBASE_API_KEY' && value ? `${value.substring(0, 5)}...` : value;
   console.log(`${key}: ${status}${value ? ` (${displayValue})` : ''}`);
 }
 console.groupEnd();
@@ -38,11 +38,15 @@ console.log('🔥 Firebase Config:', {
   apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 5)}...` : undefined,
 });
 
-console.log('🌐 Environment:', import.meta.env.MODE, import.meta.env.PROD ? '(production)' : '(development)');
+console.log(
+  '🌐 Environment:',
+  import.meta.env.MODE,
+  import.meta.env.PROD ? '(production)' : '(development)'
+);
 console.log('🔄 Current URL:', window.location.href);
 
 // 不足している設定項目をチェック
-const missingVars = envVars.filter(key => !import.meta.env[key]);
+const missingVars = envVars.filter((key) => !import.meta.env[key]);
 if (missingVars.length > 0) {
   console.warn('⚠️ Missing environment variables:', missingVars.join(', '));
   console.warn('💡 Create a .env.local file in the apps/web directory with the required variables');
@@ -59,4 +63,5 @@ try {
 }
 
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export default app;
