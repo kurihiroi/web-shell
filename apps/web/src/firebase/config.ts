@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -75,19 +75,22 @@ export const auth = app ? getAuth(app) : null;
 // Firestoreを初期化（web-shellデータベースを指定）
 export const db = app ? getFirestore(app, 'web-shell') : null;
 
-// ローカル環境では Firebase Emulator に接続する
-if (import.meta.env.DEV && db) {
-  try {
-    // Firestore emulator は通常 8080 ポートで実行される
-    connectFirestoreEmulator(db, 'localhost', 8080);
-    console.log('🔥 Connected to Firestore emulator on localhost:8080');
-  } catch (error) {
-    console.warn('⚠️ Failed to connect to Firestore emulator:', error);
-  }
-} else if (db) {
-  console.log('🔥 Using Firestore with web-shell path prefix for database');
+// 本番環境のFirestoreに接続
+if (db) {
+  console.log('🔥 Using production Firestore with web-shell database');
 } else {
   console.warn('⚠️ Firestore is not initialized. Some functionality may be limited.');
 }
+
+// ローカル環境でエミュレーターに接続したい場合はこちらを有効化
+// if (import.meta.env.DEV && db) {
+//   try {
+//     // Firestore emulator は通常 8080 ポートで実行される
+//     connectFirestoreEmulator(db, 'localhost', 8080);
+//     console.log('🔥 Connected to Firestore emulator on localhost:8080');
+//   } catch (error) {
+//     console.warn('⚠️ Failed to connect to Firestore emulator:', error);
+//   }
+// }
 
 export default app;
