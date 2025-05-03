@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@web-shell/firestore-generator": "workspace:*",
+    "@web-shell/firestore-hooks": "workspace:*",
     "firebase": "^11.6.1",
     "ramda": "^0.30.1",
     "react": "^19.1.0",

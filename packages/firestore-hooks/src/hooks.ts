@@ -1,4 +1,11 @@
 import {
+  EventCollection,
+  type EventDocument,
+  type FirestoreDocument,
+  createEventCollectionFactory,
+  getLatestEntityState,
+} from '@web-shell/firestore-generator';
+import {
   Firestore,
   type QueryConstraint,
   getFirestore,
@@ -9,9 +16,6 @@ import {
 } from 'firebase/firestore';
 import { DependencyList, useCallback, useEffect, useState } from 'react';
 import type { z } from 'zod';
-import { getEntityEvents, getLatestEntityState } from './events';
-import { createEventCollectionFactory } from './generator';
-import { EventCollection, type EventDocument, type FirestoreDocument } from './types';
 
 export function useEventSourcedEntity<T>(
   collectionName: string,

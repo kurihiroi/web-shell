@@ -32,6 +32,9 @@ importers:
       '@web-shell/firestore-generator':
         specifier: workspace:*
         version: link:../../packages/firestore-generator
+      '@web-shell/firestore-hooks':
+        specifier: workspace:*
+        version: link:../../packages/firestore-hooks
       firebase:
         specifier: ^11.6.1
         version: 11.6.1
@@ -85,12 +88,33 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
     devDependencies:
-      '@types/react':
-        specifier: ^19.1.2
-        version: 19.1.2
       '@types/uuid':
         specifier: ^9.0.8
         version: 9.0.8
+      firebase:
+        specifier: ^11.6.1
+        version: 11.6.1
+      tsup:
+        specifier: ^8.4.0
+        version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+      vitest:
+        specifier: ^1.2.2
+        version: 1.6.1(@types/node@22.15.3)
+      zod:
+        specifier: ^3.24.3
+        version: 3.24.3
+
+  packages/firestore-hooks:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.2
+        version: 19.1.2
+      '@web-shell/firestore-generator':
+        specifier: workspace:*
+        version: link:../firestore-generator
       firebase:
         specifier: ^11.6.1
         version: 11.6.1
