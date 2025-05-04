@@ -7,12 +7,6 @@ import * as R from 'ramda';
  * that leverage Ramda's functional programming capabilities.
  */
 
-// Array transformations using Ramda (needed for App.tsx)
-export const filterPositiveNumbers = R.filter((n: number) => n > 0);
-export const doubleAllNumbers = R.map(R.multiply(2));
-export const sumOfArray = R.sum;
-export const getPositiveNumbersSum = R.pipe(filterPositiveNumbers, sumOfArray);
-
 // Object manipulation
 export const pickUserData = R.pick(['id', 'name', 'email']);
 
