@@ -36,6 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Always Fix Root Cause**: When encountering build or lint errors, fix the root cause rather than bypassing checks.
 - **Quality Control**: All code must pass linting, type checking, and tests before being committed.
 - **No Direct Main Commits**: Never commit or push directly to the main branch. Always create a feature/fix branch and submit a pull request.
+- **Pre-Commit Verification**: Before committing any changes, always run `pnpm lint`, `pnpm build`, `pnpm check`, and `pnpm test` to verify that your changes don't break the application. This ensures all TypeScript checks, linting rules, and tests pass before code review.
 
 ## Notes
 This repository uses Firebase for backend and hosting with Biome for linting and formatting. All React components are written in TypeScript for better type safety and developer experience. The project uses Zod for schema validation, Ramda for functional programming utilities, and Firebase Authentication with Google provider for user authentication.
