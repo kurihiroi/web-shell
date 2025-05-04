@@ -21,13 +21,7 @@ type StrictCommand = {
 let repositoryInstance: EventSourcedRepository<StrictCommand> | null = null;
 
 // コマンド履歴のリポジトリを作成する関数
-export const createCommandHistoryRepository = (db: Firestore | null) => {
-  if (!db) {
-    throw new Error(
-      'Firestore is not initialized. Command history requires a valid Firestore instance.'
-    );
-  }
-
+export const createCommandHistoryRepository = (db: Firestore) => {
   // 既存のインスタンスがあれば再利用
   if (!repositoryInstance) {
     // CommandSchema から作成するが、内部では StrictCommand として扱う

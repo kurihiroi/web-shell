@@ -47,3 +47,4 @@ firebase-debug.*.log*
 
 # Build artifacts
 public/assets
+**/.claude/settings.local.json
