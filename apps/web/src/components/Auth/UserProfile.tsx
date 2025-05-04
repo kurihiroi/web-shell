@@ -9,11 +9,11 @@ export default function UserProfile({ className = '' }: UserProfileProps): React
   const { currentUser, logout, loading } = useAuth();
 
   if (loading) {
-    return <div className={`user-profile-loading ${className}`}>Loading...</div>;
+    return <div className={`${className} text-gray-500 p-4`}>Loading...</div>;
   }
 
   if (!currentUser) {
-    return <div className={`user-profile-not-signed-in ${className}`}>Not signed in</div>;
+    return <div className={`${className} text-gray-500 p-4`}>Not signed in</div>;
   }
 
   const handleLogout = async () => {
