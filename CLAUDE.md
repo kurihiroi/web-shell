@@ -31,5 +31,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `web`: Main React web application built with Vite
 - **Packages**: Contains shared packages used across apps
 
+## Important Rules
+- **Never Skip Pre-commit Hooks**: Never use `--no-verify` or other methods to bypass pre-commit hooks or linting. Always fix errors properly.
+- **Always Fix Root Cause**: When encountering build or lint errors, fix the root cause rather than bypassing checks.
+- **Quality Control**: All code must pass linting, type checking, and tests before being committed.
+
 ## Notes
 This repository uses Firebase for backend and hosting with Biome for linting and formatting. All React components are written in TypeScript for better type safety and developer experience. The project uses Zod for schema validation, Ramda for functional programming utilities, and Firebase Authentication with Google provider for user authentication.
