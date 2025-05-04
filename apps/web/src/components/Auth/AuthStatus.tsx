@@ -12,19 +12,15 @@ export default function AuthStatus({ className = '' }: AuthStatusProps): ReactEl
 
   return (
     <div className={`auth-status ${className}`}>
-      {error && (
-        <div className="auth-error">
-          Error: {error.message}
-        </div>
-      )}
-      
+      {error && <div className="text-red-500 p-2 rounded bg-red-100">Error: {error.message}</div>}
+
       {loading ? (
-        <div className="auth-loading">Loading authentication status...</div>
+        <div className="text-gray-600">Loading authentication status...</div>
       ) : currentUser ? (
         <UserProfile />
       ) : (
-        <div className="auth-sign-in">
-          <p>Sign in to access your account</p>
+        <div className="p-4 border rounded bg-gray-50">
+          <p className="mb-2">Sign in to access your account</p>
           <GoogleSignInButton />
         </div>
       )}
