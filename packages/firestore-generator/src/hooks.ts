@@ -200,10 +200,10 @@ export function useEventSourcedCollection<T>(
 
     // Handle the promise properly
     unsubscribePromise
-      .then((unsub) => {
+      .then((unsub: (() => void) | undefined) => {
         unsubscribe = unsub;
       })
-      .catch((err) => console.error('Error setting up unsubscribe:', err));
+      .catch((err: Error) => console.error('Error setting up unsubscribe:', err));
 
     return () => {
       if (unsubscribe) {
