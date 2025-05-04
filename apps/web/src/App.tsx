@@ -4,16 +4,10 @@ import './App.css';
 import AuthStatus from './components/Auth/AuthStatus';
 import Shell from './components/Shell/Shell';
 import { AuthProvider } from './context/AuthContext';
-import { doubleAllNumbers, getPositiveNumbersSum } from './utils/helpers';
 import './components/Auth/Auth.css';
 
 function App(): ReactElement {
   const [count, setCount] = useState<number>(0);
-  const [numbers] = useState<number[]>([1, -2, 3, -4, 5]);
-
-  // Ramda examples
-  const positiveSum = getPositiveNumbersSum(numbers);
-  const doubledNumbers = doubleAllNumbers(numbers);
 
   return (
     <AuthProvider>
@@ -34,13 +28,6 @@ function App(): ReactElement {
         <div className="shell-example">
           <h3>Web Shell</h3>
           <Shell />
-        </div>
-
-        <div className="ramda-example">
-          <h3>Ramda Examples</h3>
-          <p>Original numbers: {JSON.stringify(numbers)}</p>
-          <p>Sum of positive numbers: {positiveSum}</p>
-          <p>Doubled numbers: {JSON.stringify(doubledNumbers)}</p>
         </div>
       </div>
     </AuthProvider>
