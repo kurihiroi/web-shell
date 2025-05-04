@@ -1,4 +1,7 @@
 import { type FormEvent, useEffect, useState } from 'react';
+import { BsTerminal } from 'react-icons/bs';
+import { FaExclamationTriangle, FaHistory } from 'react-icons/fa';
+import { IoMdSend } from 'react-icons/io';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase/config';
 import type { Command } from '../../models/CommandHistory';
@@ -137,7 +140,9 @@ export default function Shell() {
       </div>
 
       <form onSubmit={executeCommand} className="flex p-2 bg-gray-800 border-t border-gray-700">
-        <div className="flex items-center px-2 text-green-500 font-bold font-mono">$</div>
+        <div className="flex items-center px-2 text-green-500 font-bold font-mono">
+          <BsTerminal className="mr-1" />$
+        </div>
         <input
           type="text"
           className="flex-1 bg-transparent border-none text-gray-100 font-mono text-sm p-2 outline-none"
@@ -148,16 +153,20 @@ export default function Shell() {
         />
         <button
           type="submit"
-          className="bg-green-600 text-white border-none rounded px-4 py-2 font-bold transition-colors hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          className="bg-green-600 text-white border-none rounded px-4 py-2 font-bold transition-colors hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center"
           disabled={isProcessing || !user}
         >
+          <IoMdSend className="mr-1" />
           Execute
         </button>
       </form>
 
       {user && commandHistory.length > 0 && (
         <div className="p-2 px-4 bg-gray-800 border-t border-gray-700">
-          <h4 className="my-2 text-gray-400 text-sm">Command History</h4>
+          <h4 className="my-2 text-gray-400 text-sm flex items-center">
+            <FaHistory className="mr-2" />
+            Command History
+          </h4>
           <div className="p-0 m-0 max-h-[150px] overflow-y-auto">
             {commandHistory.map((cmd, index) => (
               <button
@@ -185,7 +194,8 @@ export default function Shell() {
       )}
 
       {!user && (
-        <div className="p-3 text-center bg-gray-800 border-t border-gray-700 text-yellow-500 text-sm">
+        <div className="p-3 text-center bg-gray-800 border-t border-gray-700 text-yellow-500 text-sm flex items-center justify-center">
+          <FaExclamationTriangle className="mr-2" />
           Please sign in to use the shell and save command history.
         </div>
       )}

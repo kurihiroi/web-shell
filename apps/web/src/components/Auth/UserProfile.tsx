@@ -1,4 +1,6 @@
 import type { ReactElement } from 'react';
+import { BiLoaderAlt } from 'react-icons/bi';
+import { FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 interface UserProfileProps {
@@ -9,7 +11,12 @@ export default function UserProfile({ className = '' }: UserProfileProps): React
   const { currentUser, logout, loading } = useAuth();
 
   if (loading) {
-    return <div className={`${className} text-gray-500 p-4`}>Loading...</div>;
+    return (
+      <div className={`${className} text-gray-500 p-4 flex items-center`}>
+        <BiLoaderAlt className="animate-spin mr-2" />
+        Loading...
+      </div>
+    );
   }
 
   if (!currentUser) {
@@ -44,8 +51,9 @@ export default function UserProfile({ className = '' }: UserProfileProps): React
       <button
         type="button"
         onClick={handleLogout}
-        className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded text-sm transition-colors"
+        className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded text-sm transition-colors flex items-center"
       >
+        <FiLogOut className="mr-1" />
         Sign Out
       </button>
     </div>
