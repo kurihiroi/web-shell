@@ -27,65 +27,11 @@ button:hover {
   border-color: #646cff;
 }
 
-.ramda-example, .zod-example, .auth-example {
+.ramda-example,
+.auth-example {
   margin-top: 2rem;
   padding: 1.5rem;
   border: 1px solid #eee;
   border-radius: 8px;
   text-align: left;
-}
-
-.zod-example form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.zod-example form div {
-  display: flex;
-  flex-direction: column;
-}
-
-.zod-example label {
-  margin-bottom: 0.5rem;
-}
-
-.zod-example input[type="text"],
-.zod-example input[type="password"] {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.zod-example input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
-
-.zod-example button {
-  align-self: flex-start;
-  padding: 0.5rem 1rem;
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.zod-example button:hover {
-  background-color: #0055aa;
-}
-
-.errors {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #ffeeee;
-  border: 1px solid #ffcccc;
-  border-radius: 4px;
-  color: #cc0000;
-}
-
-.errors ul {
-  margin: 0;
-  padding-left: 1.5rem;
 }
