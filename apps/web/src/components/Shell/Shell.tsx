@@ -12,16 +12,28 @@ export default function Shell() {
   const [commandHistory, setCommandHistory] = useState<Command[]>([]);
   const [output, setOutput] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [commandRepo, setCommandRepo] = useState<ReturnType<
+    typeof createCommandHistoryRepository
+  > | null>(null);
 
   const { user } = useAuth();
-  const commandRepo = createCommandHistoryRepository(db) as NonNullable<
-    ReturnType<typeof createCommandHistoryRepository>
-  >;
+
+  // Firestore repository の初期化
+  useEffect(() => {
+    if (db) {
+      try {
+        setCommandRepo(createCommandHistoryRepository(db));
+      } catch (error) {
+        console.error('Failed to initialize command repository:', error);
+        setOutput((prev) => `${prev}\nError: Could not initialize command history.`);
+      }
+    }
+  }, []);
 
   // コマンド履歴を取得
   useEffect(() => {
     const fetchCommandHistory = async () => {
-      if (!user || !db) return;
+      if (!user || !db || !commandRepo) return;
 
       try {
         const history = await commandRepo.findAll();
@@ -49,9 +61,9 @@ export default function Shell() {
     };
 
     // Firestoreが利用可能な場合のみ履歴を取得
-    if (db) {
+    if (db && commandRepo) {
       fetchCommandHistory();
-    } else {
+    } else if (!db) {
       console.warn('Firestore is not available. Command history will not be loaded.');
     }
   }, [user, commandRepo]);
@@ -85,20 +97,16 @@ export default function Shell() {
       newCommand.output = dummyOutput;
 
       // Firestoreに保存（利用可能な場合のみ）
-      if (user && db) {
+      if (user && db && commandRepo) {
         try {
           await commandRepo.create(newCommand);
-          // 履歴を更新
-          setCommandHistory((prev) => [newCommand, ...prev]);
         } catch (dbError) {
           console.error('Failed to save command to Firestore:', dbError);
-          // データベースエラーでもローカル履歴には追加
-          setCommandHistory((prev) => [newCommand, ...prev]);
         }
-      } else {
-        // データベースが利用できなくてもUIには表示
-        setCommandHistory((prev) => [newCommand, ...prev]);
       }
+
+      // UIに追加
+      setCommandHistory((prev) => [newCommand, ...prev]);
     } catch (error) {
       console.error('Error executing command:', error);
       setOutput(
@@ -110,7 +118,7 @@ export default function Shell() {
       newCommand.output = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
 
       // エラー状態もFirestoreに保存（利用可能な場合のみ）
-      if (user && db) {
+      if (user && db && commandRepo) {
         try {
           await commandRepo.create(newCommand);
         } catch (dbError) {
@@ -118,7 +126,7 @@ export default function Shell() {
         }
       }
 
-      // データベースが利用できなくてもUIには表示
+      // UIに追加
       setCommandHistory((prev) => [newCommand, ...prev]);
     } finally {
       setCommand('');
