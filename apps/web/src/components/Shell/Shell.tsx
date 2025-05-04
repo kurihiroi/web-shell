@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase/config';
 import type { Command } from '../../models/CommandHistory';
 import { createCommandHistoryRepository } from '../../repositories/CommandHistoryRepository';
-import './Shell.css';
 
 export default function Shell() {
   const [command, setCommand] = useState('');
@@ -130,39 +129,53 @@ export default function Shell() {
   };
 
   return (
-    <div className="shell-container">
-      <div className="shell-output">
-        <pre>{output || 'Welcome to Web Shell. Type a command and press Enter.'}</pre>
+    <div className="w-full max-w-3xl mx-auto bg-gray-900 rounded-lg overflow-hidden shadow-lg text-gray-100">
+      <div className="p-3 min-h-[200px] max-h-[400px] overflow-y-auto bg-black font-mono text-sm leading-relaxed">
+        <pre className="m-0 whitespace-pre-wrap break-words">
+          {output || 'Welcome to Web Shell. Type a command and press Enter.'}
+        </pre>
       </div>
 
-      <form onSubmit={executeCommand} className="shell-input-form">
-        <div className="shell-prompt">$</div>
+      <form onSubmit={executeCommand} className="flex p-2 bg-gray-800 border-t border-gray-700">
+        <div className="flex items-center px-2 text-green-500 font-bold font-mono">$</div>
         <input
           type="text"
-          className="shell-input"
+          className="flex-1 bg-transparent border-none text-gray-100 font-mono text-sm p-2 outline-none"
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           placeholder="Enter command..."
           disabled={isProcessing || !user}
         />
-        <button type="submit" className="shell-button" disabled={isProcessing || !user}>
+        <button
+          type="submit"
+          className="bg-green-600 text-white border-none rounded px-4 py-2 font-bold transition-colors hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          disabled={isProcessing || !user}
+        >
           Execute
         </button>
       </form>
 
       {user && commandHistory.length > 0 && (
-        <div className="command-history">
-          <h4>Command History</h4>
-          <div className="history-items">
+        <div className="p-2 px-4 bg-gray-800 border-t border-gray-700">
+          <h4 className="my-2 text-gray-400 text-sm">Command History</h4>
+          <div className="p-0 m-0 max-h-[150px] overflow-y-auto">
             {commandHistory.map((cmd, index) => (
               <button
                 key={`cmd-${cmd.command}-${index}`}
-                className={`history-item status-${cmd.status}`}
+                className={`flex justify-between w-full p-2 cursor-pointer border-none border-b border-gray-700 bg-transparent text-gray-100 text-left transition-colors hover:bg-gray-700 ${
+                  cmd.status === 'success'
+                    ? 'border-l-4 border-l-green-500'
+                    : cmd.status === 'error'
+                      ? 'border-l-4 border-l-red-500'
+                      : 'border-l-4 border-l-yellow-500'
+                }`}
                 onClick={() => selectCommand(cmd.command)}
                 type="button"
               >
-                <span className="history-command">{cmd.command}</span>
-                <span className="history-time">
+                <span className="font-mono text-xs max-w-[70%] overflow-hidden text-ellipsis whitespace-nowrap">
+                  {cmd.command}
+                </span>
+                <span className="text-xs text-gray-400">
                   {cmd.timestamp ? new Date(cmd.timestamp).toLocaleString() : 'Unknown time'}
                 </span>
               </button>
@@ -172,7 +185,7 @@ export default function Shell() {
       )}
 
       {!user && (
-        <div className="auth-warning">
+        <div className="p-3 text-center bg-gray-800 border-t border-gray-700 text-yellow-500 text-sm">
           Please sign in to use the shell and save command history.
         </div>
       )}

@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import './App.css';
 import AuthStatus from './components/Auth/AuthStatus';
 import Shell from './components/Shell/Shell';
 import { AuthProvider } from './context/AuthContext';
 import { doubleAllNumbers, getPositiveNumbersSum } from './utils/helpers';
-import './components/Auth/Auth.css';
 
 function App(): ReactElement {
   const [count, setCount] = useState<number>(0);
@@ -17,27 +15,31 @@ function App(): ReactElement {
 
   return (
     <AuthProvider>
-      <div className="app">
-        <h1>Web Shell</h1>
+      <div className="max-w-5xl mx-auto p-8 text-center">
+        <h1 className="text-4xl font-bold mb-6">Web Shell</h1>
 
-        <div className="card">
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
+        <div className="p-8">
+          <button
+            type="button"
+            className="m-4 rounded-lg border border-transparent px-5 py-2.5 text-base font-medium bg-gray-800 text-white hover:border-blue-500 transition-colors"
+            onClick={() => setCount((count) => count + 1)}
+          >
             count is {count}
           </button>
         </div>
 
-        <div className="auth-example">
-          <h3>Firebase Auth Example</h3>
+        <div className="mt-8 p-6 border border-gray-200 rounded-lg text-left">
+          <h3 className="text-xl font-semibold mb-3">Firebase Auth Example</h3>
           <AuthStatus />
         </div>
 
-        <div className="shell-example">
-          <h3>Web Shell</h3>
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-3">Web Shell</h3>
           <Shell />
         </div>
 
-        <div className="ramda-example">
-          <h3>Ramda Examples</h3>
+        <div className="mt-8 p-6 border border-gray-200 rounded-lg text-left">
+          <h3 className="text-xl font-semibold mb-3">Ramda Examples</h3>
           <p>Original numbers: {JSON.stringify(numbers)}</p>
           <p>Sum of positive numbers: {positiveSum}</p>
           <p>Doubled numbers: {JSON.stringify(doubledNumbers)}</p>
