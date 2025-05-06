@@ -2,8 +2,8 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { BsTerminal } from 'react-icons/bs';
 import { FaExclamationTriangle, FaHistory } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
-import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase/config';
+import { useAuth } from '../../hooks/useAuth';
 import type { Command } from '../../models/CommandHistory';
 import { createCommandHistoryRepository } from '../../repositories/CommandHistoryRepository';
 
