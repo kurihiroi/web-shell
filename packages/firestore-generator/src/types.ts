@@ -30,10 +30,6 @@ export interface FirestoreCollection<T> {
   query: (db: Firestore, ...constraints: QueryConstraint[]) => Query<FirestoreDocument<T>>;
 }
 
-export interface FirestoreGenerator {
-  createCollection: <T>(collectionName: string, schema: z.ZodType<T>) => FirestoreCollection<T>;
-}
-
 export type TimestampFields = {
   serverTimestamp: Date | null;
   clientTimestamp: Date;
