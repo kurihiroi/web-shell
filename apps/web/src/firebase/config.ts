@@ -93,4 +93,4 @@ if (db) {
 //   }
 // }
 
-export default app;
+export const firebaseApp = app;

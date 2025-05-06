@@ -16,7 +16,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Code Style Guidelines
 - **Formatting**: 2-space indentation, single quotes, 100 char line width, trailing commas (ES5), semicolons required
-- **Imports**: Organize imports with external libraries first, then internal modules (Biome handles this automatically)
+- **Imports**: 
+  - Use ES modules syntax (`import`/`export`) exclusively - no CommonJS (`require`/`module.exports`)
+  - Organize imports with external libraries first, then internal modules (Biome handles this automatically)
+  - Use named exports over default exports for better refactoring support
+  - Use type imports (`import type { X } from 'y'`) for type-only imports
 - **Types**: Use TypeScript for type safety. Always define proper types for props, state, and function parameters/returns
 - **TypeScript**: Prefer interfaces for object shapes, use type for unions/intersections, avoid any, enable strict mode
 - **Naming**: camelCase for variables/functions, PascalCase for components/classes/interfaces, type names
