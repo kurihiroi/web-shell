@@ -1,14 +1,20 @@
 import {
+  type CollectionReference,
   type DocumentData,
+  type DocumentReference,
   type FieldValue,
   type Firestore,
   type FirestoreDataConverter,
   type PartialWithFieldValue,
+  type Query,
+  type QueryConstraint,
   type QueryDocumentSnapshot,
   Timestamp,
   type WithFieldValue,
   collection,
+  doc,
   onSnapshot,
+  query,
   serverTimestamp,
 } from 'firebase/firestore';
 import { z } from 'zod';
@@ -121,15 +127,13 @@ export function createConverter<T>(schema: z.ZodType<T>): FirestoreDataConverter
 /**
  * Watches a Firestore collection for changes and triggers a callback function when changes occur.
  *
- * @param db - Firestore database instance
- * @param collectionPath - Path to the Firestore collection to watch
+ * @param collectionRef - Reference to the Firestore collection to watch
  * @param callback - Function that will be called with the change event containing type, id, and data
  * @param schema - Zod schema for validating document data
  * @returns An unsubscribe function that can be called to stop watching for changes
  */
 export function watchCollection<T>(
-  db: Firestore,
-  collectionPath: string,
+  collectionRef: CollectionReference<DocumentData>,
   callback: (event: FirestoreChangeEvent<T>) => void,
   schema: z.ZodType<T>
 ): () => void {
@@ -137,12 +141,12 @@ export function watchCollection<T>(
     // Create a converter from the schema
     const converter = createConverter(schema);
 
-    // Create a collection reference with the converter
-    const collectionRef = collection(db, collectionPath).withConverter(converter);
+    // Apply the converter to the collection reference
+    const typedCollectionRef = collectionRef.withConverter(converter);
 
     // Set up the snapshot listener and return the unsubscribe function
     const unsubscribe = onSnapshot(
-      collectionRef,
+      typedCollectionRef,
       (snapshot) => {
         // Process each change in the snapshot
         for (const change of snapshot.docChanges()) {
@@ -172,14 +176,14 @@ export function watchCollection<T>(
         }
       },
       (error) => {
-        console.error(`Error watching Firestore collection ${collectionPath}:`, error);
+        console.error(`Error watching Firestore collection ${collectionRef.path}:`, error);
         throw error; // Re-throw to ensure errors are not silently ignored
       }
     );
 
     return unsubscribe;
   } catch (error) {
-    console.error(`Failed to set up listener for collection ${collectionPath}:`, error);
+    console.error(`Failed to set up listener for collection ${collectionRef.path}:`, error);
     // Re-throw the error instead of returning a no-op function
     throw error;
   }
@@ -288,6 +292,51 @@ export function createDiscriminatedDocument<T extends string, D extends object>(
 }
 
 /**
+ * Creates a typed collection reference using a Zod schema for validation
+ *
+ * @param db - Firestore database instance
+ * @param collectionPath - Path to the Firestore collection
+ * @param schema - Zod schema for validating document data
+ * @returns A typed CollectionReference for the given path and schema
+ */
+export function createCollectionRef<T>(
+  db: Firestore,
+  collectionPath: string,
+  schema: z.ZodType<T>
+): CollectionReference<T> {
+  const converter = createConverter(schema);
+  return collection(db, collectionPath).withConverter(converter);
+}
+
+/**
+ * Creates a typed document reference within a collection
+ *
+ * @param collectionRef - Reference to the Firestore collection
+ * @param docId - ID of the document
+ * @returns A typed DocumentReference for the given collection and document ID
+ */
+export function createDocumentRef<T>(
+  collectionRef: CollectionReference<T>,
+  docId: string
+): DocumentReference<T> {
+  return doc(collectionRef, docId);
+}
+
+/**
+ * Creates a typed query from a collection reference with optional query constraints
+ *
+ * @param collectionRef - Reference to the Firestore collection
+ * @param constraints - Optional query constraints (where, orderBy, limit, etc.)
+ * @returns A typed Query for the given collection with applied constraints
+ */
+export function createQuery<T>(
+  collectionRef: CollectionReference<T>,
+  ...constraints: QueryConstraint[]
+): Query<T> {
+  return query(collectionRef, ...constraints);
+}
+
+/**
  * Example usage:
  *
  * ```typescript
@@ -313,6 +362,9 @@ export function createDiscriminatedDocument<T extends string, D extends object>(
  *   email: 'john@example.com',
  *   isActive: true,
  * });
+ *
+ * // Create a typed collection reference
+ * const usersCollectionRef = createCollectionRef(db, 'users', userSchema);
  *
  * // DISCRIMINATED UNION EXAMPLE
  * // Define different document schemas for each type
@@ -350,6 +402,9 @@ export function createDiscriminatedDocument<T extends string, D extends object>(
  * // Infer the union type
  * type StoreDocument = z.infer<typeof storeDocumentSchema>;
  *
+ * // Create a typed collection reference for the store
+ * const storeCollectionRef = createCollectionRef(db, 'store', storeDocumentSchema);
+ *
  * // Now we can create documents of specific types
  * const newCustomer = createDiscriminatedDocument('customer', {
  *   name: 'Jane Smith',
@@ -367,8 +422,7 @@ export function createDiscriminatedDocument<T extends string, D extends object>(
  *
  * // Watch a collection with discriminated types
  * const unsubscribe = watchCollection<StoreDocument>(
- *   db,
- *   'store',
+ *   storeCollectionRef,
  *   (event) => {
  *     // The event.data is fully typed based on the discriminated union
  *     console.log(`Document ${event.id} was ${event.type}`);
@@ -395,6 +449,16 @@ export function createDiscriminatedDocument<T extends string, D extends object>(
  *     console.log(`Created at: ${event.data.clientTimestamp.toDate()}`);
  *   },
  *   storeDocumentSchema
+ * );
+ *
+ * // Create a query with constraints
+ * // Import where and orderBy from 'firebase/firestore' first
+ * // import { where, orderBy } from 'firebase/firestore';
+ * const activeProductsQuery = createQuery(
+ *   storeCollectionRef,
+ *   where('type', '==', 'product'),
+ *   where('inventory', '>', 0),
+ *   orderBy('price', 'asc')
  * );
  *
  * // Don't forget to unsubscribe when done
