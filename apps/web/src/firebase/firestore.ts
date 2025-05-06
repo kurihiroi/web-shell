@@ -11,6 +11,7 @@ import {
   type QueryDocumentSnapshot,
   Timestamp,
   type WithFieldValue,
+  addDoc,
   collection,
   doc,
   onSnapshot,
@@ -337,6 +338,25 @@ export function createQuery<T>(
 }
 
 /**
+ * Adds a document to a Firestore collection with an auto-generated ID
+ *
+ * @param collectionRef - Reference to the Firestore collection
+ * @param data - Document data to add
+ * @returns A promise that resolves to the DocumentReference of the newly created document
+ */
+export async function addDocument<T extends object>(
+  collectionRef: CollectionReference<T>,
+  data: T
+): Promise<DocumentReference<T>> {
+  // Add timestamps to the data if it doesn't already have them
+  // This ensures all documents have consistent timestamp fields
+  const dataWithTimestamps = 'clientTimestamp' in data ? data : createDocumentWithTimestamps(data);
+
+  // Write the document to Firestore with an auto-generated ID
+  return await addDoc(collectionRef, dataWithTimestamps);
+}
+
+/**
  * Example usage:
  *
  * ```typescript
@@ -460,6 +480,10 @@ export function createQuery<T>(
  *   where('inventory', '>', 0),
  *   orderBy('price', 'asc')
  * );
+ *
+ * // Add a new product with auto-generated ID
+ * const newProductRef = await addDocument(storeCollectionRef, newProduct);
+ * console.log(`New product added with ID: ${newProductRef.id}`);
  *
  * // Don't forget to unsubscribe when done
  * // unsubscribe();
