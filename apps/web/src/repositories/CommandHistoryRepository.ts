@@ -1,6 +1,7 @@
-// 修正済み：@web-shell/firestore-generatorからのインポート
+// @web-shell/firestore-generatorからのインポート
 import {
   type EventSourcedRepository,
+  type FirestoreDocument,
   createEventSourcedRepository,
 } from '@web-shell/firestore-generator';
 import type { Firestore } from 'firebase/firestore';
@@ -23,3 +24,6 @@ export const createCommandHistoryRepository = (db: Firestore) => {
 
   return repositoryInstance;
 };
+
+// コマンド履歴のドキュメントの型をエクスポート
+export type CommandDocument = FirestoreDocument<Command>;
