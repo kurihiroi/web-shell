@@ -4,8 +4,11 @@ import { FaExclamationTriangle, FaHistory } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
 import { db } from '../../firebase/config';
 import { useAuth } from '../../hooks/useAuth';
-import type { Command } from '../../models/CommandHistory';
-import { createCommandHistoryRepository } from '../../repositories/CommandHistoryRepository';
+import {
+  type Command,
+  type CommandDocument,
+  createCommandHistoryRepository,
+} from '../../repositories/CommandHistoryRepository';
 
 export default function Shell() {
   const [command, setCommand] = useState('');
@@ -40,11 +43,11 @@ export default function Shell() {
         // 新しいコマンドを先頭に表示するよう並び替え
         setCommandHistory(
           history
-            .map((item) => ({
+            .map((item: CommandDocument) => ({
               command: item.command,
               timestamp: item.clientTimestamp,
               userId: item.userId,
-              status: item.status as 'success' | 'error' | 'pending',
+              status: item.status,
               output: item.output,
               workingDirectory: item.workingDirectory,
             }))
