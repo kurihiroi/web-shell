@@ -1,7 +1,7 @@
-import { type EventDocument, createEventCollectionFactory } from '@web-shell/firestore-generator';
 import { getFirestore, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { z } from 'zod';
+import { type EventDocument, createEventCollectionFactory } from '../../utils/firestore';
 
 /**
  * Reactフック: エンティティの履歴（イベント履歴）を取得して監視
