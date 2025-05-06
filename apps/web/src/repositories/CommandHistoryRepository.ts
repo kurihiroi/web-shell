@@ -5,7 +5,7 @@ import {
   type EventSourcedRepository,
   type FirestoreDocument,
   createEventSourcedRepository,
-} from '../utils/firestore';
+} from '../firebase/firestore';
 
 // コマンド履歴のコレクション名
 export const COMMAND_HISTORY_COLLECTION = 'command_history';

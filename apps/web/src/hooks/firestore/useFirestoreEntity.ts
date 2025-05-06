@@ -5,7 +5,7 @@ import {
   type FirestoreDocument,
   createEventCollectionFactory,
   getLatestEntityState,
-} from '../../utils/firestore';
+} from '../../firebase/firestore';
 
 /**
  * Reactフック: イベントソーシングパターンに基づく単一エンティティの取得と監視
