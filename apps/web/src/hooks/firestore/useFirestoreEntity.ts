@@ -1,11 +1,11 @@
+import { getFirestore, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import type { z } from 'zod';
 import {
   type FirestoreDocument,
   createEventCollectionFactory,
   getLatestEntityState,
-} from '@web-shell/firestore-generator';
-import { getFirestore, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-import type { z } from 'zod';
+} from '../../firebase/firestore';
 
 /**
  * Reactフック: イベントソーシングパターンに基づく単一エンティティの取得と監視

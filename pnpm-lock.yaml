@@ -32,9 +32,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@web-shell/firestore-generator':
-        specifier: workspace:*
-        version: link:../../packages/firestore-generator
       firebase:
         specifier: ^11.6.1
         version: 11.6.1
@@ -50,6 +47,9 @@ importers:
       react-icons:
         specifier: ^5.5.0
         version: 5.5.0(react@19.1.0)
+      uuid:
+        specifier: ^9.0.1
+        version: 9.0.1
       zod:
         specifier: ^3.24.3
         version: 3.24.3
@@ -63,6 +63,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.1.2
         version: 19.1.2(@types/react@19.1.2)
+      '@types/uuid':
+        specifier: ^9.0.8
+        version: 9.0.8
       '@vitejs/plugin-react':
         specifier: ^4.2.0
         version: 4.4.1(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.7.1))

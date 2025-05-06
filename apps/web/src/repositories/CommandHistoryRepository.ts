@@ -1,11 +1,11 @@
-// @web-shell/firestore-generatorからのインポート
+import type { Firestore } from 'firebase/firestore';
+import { z } from 'zod';
+// 内部Firestoreユーティリティからのインポート
 import {
   type EventSourcedRepository,
   type FirestoreDocument,
   createEventSourcedRepository,
-} from '@web-shell/firestore-generator';
-import type { Firestore } from 'firebase/firestore';
-import { z } from 'zod';
+} from '../firebase/firestore';
 
 // コマンド履歴のコレクション名
 export const COMMAND_HISTORY_COLLECTION = 'command_history';

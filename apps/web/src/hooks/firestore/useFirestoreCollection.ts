@@ -1,11 +1,11 @@
+import { type QueryConstraint, getFirestore, onSnapshot, query } from 'firebase/firestore';
+import { useCallback, useEffect, useState } from 'react';
+import type { z } from 'zod';
 import {
   type FirestoreDocument,
   createEventCollectionFactory,
   getLatestEntityState,
-} from '@web-shell/firestore-generator';
-import { type QueryConstraint, getFirestore, onSnapshot, query } from 'firebase/firestore';
-import { useCallback, useEffect, useState } from 'react';
-import type { z } from 'zod';
+} from '../../firebase/firestore';
 
 /**
  * Reactフック: イベントソーシングパターンに基づくコレクションの取得と監視
