@@ -67,6 +67,20 @@ export const BaseDocumentSchema = z.object({
 export type BaseDocument = z.infer<typeof BaseDocumentSchema>;
 
 /**
+ * Base schema for discriminated union document types
+ * Adds a required 'type' field to identify the document type
+ */
+export const DiscriminatedDocumentSchema = BaseDocumentSchema.extend({
+  // Type field for discriminating between different document types
+  type: z.string(),
+});
+
+/**
+ * Type inferred from the discriminated document schema
+ */
+export type DiscriminatedDocument = z.infer<typeof DiscriminatedDocumentSchema>;
+
+/**
  * Creates a Firestore data converter using a Zod schema for type validation
  *
  * @param schema - Zod schema for validating document data
@@ -212,9 +226,72 @@ export function createDocumentSchema<T extends z.ZodRawShape>(schema: z.ZodObjec
 }
 
 /**
+ * Creates a discriminated document schema with a specific type value
+ *
+ * @param type - The string literal type identifier
+ * @param schema - The schema for document-specific fields
+ * @returns A schema for the discriminated document type
+ */
+export function createDiscriminatedDocumentSchema<T extends string, S extends z.ZodRawShape>(
+  type: T,
+  schema: z.ZodObject<S>
+): ZodDiscriminatedObjectSchema<T> {
+  return DiscriminatedDocumentSchema.extend({
+    type: z.literal(type),
+    ...schema.shape,
+  }) as ZodDiscriminatedObjectSchema<T>;
+}
+
+/**
+ * Type for a Zod object schema that has a 'type' discriminator field with a literal string value
+ */
+export type ZodDiscriminatedObjectSchema<T extends string = string> = z.ZodObject<
+  z.ZodRawShape & { type: z.ZodLiteral<T> }
+>;
+
+/**
+ * Creates a discriminated union from multiple document schemas
+ * Each schema must have a 'type' field with a literal string value
+ *
+ * @param schemas - Array of document schemas with type discriminators
+ * @returns A Zod union representing the discriminated document types
+ */
+export function createDiscriminatedUnion<
+  T extends string,
+  U extends [ZodDiscriminatedObjectSchema<T>, ...ZodDiscriminatedObjectSchema<T>[]],
+>(
+  // The input is an array of Zod object schemas with 'type' discriminator
+  schemas: readonly [...U]
+): z.ZodDiscriminatedUnion<'type', readonly [...U]> {
+  // The type parameter 'type' is the discriminator field name
+  // U is a tuple type of at least one schema, ensuring we have at least one schema
+  return z.discriminatedUnion('type', schemas);
+}
+
+/**
+ * Creates a document with timestamps and a specific type discriminator
+ *
+ * @param type - The type discriminator string
+ * @param data - The document data without timestamps and type
+ * @returns Document data with timestamps and type field added
+ */
+export function createDiscriminatedDocument<T extends string, D extends object>(
+  type: T,
+  data: D
+): D & Omit<DiscriminatedDocument, 'type'> & { type: T } {
+  return {
+    ...data,
+    type,
+    serverTimestamp: null, // Will be set by server when committed
+    clientTimestamp: Timestamp.now(),
+  };
+}
+
+/**
  * Example usage:
  *
  * ```typescript
+ * // BASIC DOCUMENT EXAMPLE WITH TIMESTAMPS
  * // Define a Zod schema for your data type (without timestamps)
  * const userDataSchema = z.object({
  *   name: z.string(),
@@ -229,26 +306,7 @@ export function createDocumentSchema<T extends z.ZodRawShape>(schema: z.ZodObjec
  * // Infer TypeScript type from the schema
  * type User = z.infer<typeof userSchema>;
  *
- * // Use watchCollection with the schema
- * const unsubscribe = watchCollection<User>(
- *   db,
- *   'users',
- *   (event) => {
- *     console.log(`User ${event.id} was ${event.type}`);
- *     console.log('User data:', event.data);
- *     // event.data is fully typed as User with timestamp fields
- *     console.log(`User ${event.data.name} was created at ${event.data.clientTimestamp.toDate()}`);
- *
- *     // Check if server has processed the document
- *     if (event.data.serverTimestamp) {
- *       console.log(`Server processed at: ${event.data.serverTimestamp.toDate()}`);
- *     }
- *   },
- *   userSchema
- * );
- *
- * // CREATING DOCUMENTS
- * // When creating new documents, add timestamps
+ * // Create a user document with timestamps
  * const newUser = createDocumentWithTimestamps({
  *   name: 'John Doe',
  *   age: 25,
@@ -256,27 +314,90 @@ export function createDocumentSchema<T extends z.ZodRawShape>(schema: z.ZodObjec
  *   isActive: true,
  * });
  *
- * // Add to Firestore with type safety
- * // Example: await addDoc(collection(db, 'users'), newUser);
+ * // DISCRIMINATED UNION EXAMPLE
+ * // Define different document schemas for each type
+ * const customerSchema = createDiscriminatedDocumentSchema('customer', z.object({
+ *   name: z.string(),
+ *   email: z.string().email(),
+ *   subscription: z.enum(['free', 'basic', 'premium']),
+ * }));
  *
- * // UPDATING DOCUMENTS
- * // When updating a document, use updateWithServerTimestamp to update the server timestamp
- * const userUpdates = updateWithServerTimestamp({
- *   name: 'John Smith', // Updated name
- *   age: 26, // Updated age
+ * const productSchema = createDiscriminatedDocumentSchema('product', z.object({
+ *   name: z.string(),
+ *   price: z.number(),
+ *   inventory: z.number(),
+ *   category: z.string(),
+ * }));
+ *
+ * const orderSchema = createDiscriminatedDocumentSchema('order', z.object({
+ *   customerId: z.string(),
+ *   items: z.array(z.object({
+ *     productId: z.string(),
+ *     quantity: z.number(),
+ *     price: z.number(),
+ *   })),
+ *   total: z.number(),
+ *   status: z.enum(['pending', 'processing', 'shipped', 'delivered']),
+ * }));
+ *
+ * // Create a discriminated union of all document types
+ * const storeDocumentSchema = createDiscriminatedUnion([
+ *   customerSchema,
+ *   productSchema,
+ *   orderSchema,
+ * ]);
+ *
+ * // Infer the union type
+ * type StoreDocument = z.infer<typeof storeDocumentSchema>;
+ *
+ * // Now we can create documents of specific types
+ * const newCustomer = createDiscriminatedDocument('customer', {
+ *   name: 'Jane Smith',
+ *   email: 'jane@example.com',
+ *   subscription: 'premium',
  * });
  *
- * // Update the document with these changes
- * // Example: await updateDoc(docRef, userUpdates);
+ * // Type checking works - this would cause a type error if 'inventory' is misspelled or wrong type
+ * const newProduct = createDiscriminatedDocument('product', {
+ *   name: 'Awesome Widget',
+ *   price: 49.99,
+ *   inventory: 100,
+ *   category: 'widgets',
+ * });
  *
- * // USING CONVERTERS
- * // Create a converter for type-safe operations
- * const userConverter = createConverter(userSchema);
+ * // Watch a collection with discriminated types
+ * const unsubscribe = watchCollection<StoreDocument>(
+ *   db,
+ *   'store',
+ *   (event) => {
+ *     // The event.data is fully typed based on the discriminated union
+ *     console.log(`Document ${event.id} was ${event.type}`);
  *
- * // Use the converter with Firestore references
- * // Example: const typedUserRef = doc(db, 'users', userId).withConverter(userConverter);
+ *     // We can use type narrowing based on the discriminator
+ *     switch (event.data.type) {
+ *       case 'customer':
+ *         // event.data is narrowed to Customer type
+ *         console.log(`Customer: ${event.data.name}, Subscription: ${event.data.subscription}`);
+ *         break;
  *
- * // Don't forget to unsubscribe when done watching collections
+ *       case 'product':
+ *         // event.data is narrowed to Product type
+ *         console.log(`Product: ${event.data.name}, Price: ${event.data.price}`);
+ *         break;
+ *
+ *       case 'order':
+ *         // event.data is narrowed to Order type
+ *         console.log(`Order for customer: ${event.data.customerId}, Status: ${event.data.status}`);
+ *         break;
+ *     }
+ *
+ *     // Timestamps are available on all document types
+ *     console.log(`Created at: ${event.data.clientTimestamp.toDate()}`);
+ *   },
+ *   storeDocumentSchema
+ * );
+ *
+ * // Don't forget to unsubscribe when done
  * // unsubscribe();
  * ```
  */
