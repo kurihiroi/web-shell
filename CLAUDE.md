@@ -22,6 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Naming**: camelCase for variables/functions, PascalCase for components/classes/interfaces, type names
 - **Error Handling**: Use try/catch with async/await and provide meaningful error messages
 - **React**: No need for React import (using React 19), functional components preferred with proper type annotations
+- **State Management**: Use custom hooks instead of Context API for state management. Create reusable hooks in the `hooks` directory
 - **Firebase**: Keep security rules principle of least privilege
 - **Database**: Structure Firestore data for shallow queries and minimal reads
 
@@ -29,6 +30,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Monorepo**: Uses Turborepo for managing the monorepo
 - **Apps**: Contains the main applications
   - `web`: Main React web application built with Vite
+    - `src/components`: React components organized by feature
+    - `src/hooks`: Custom hooks for state management and shared logic
+    - `src/firebase`: Firebase configuration and auth utilities
+    - `src/models`: Type definitions and schemas
+    - `src/repositories`: Data access layer for Firestore
 - **Packages**: Contains shared packages used across apps
 
 ## Important Rules
