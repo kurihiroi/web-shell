@@ -5,7 +5,27 @@ import {
   createEventSourcedRepository,
 } from '@web-shell/firestore-generator';
 import type { Firestore } from 'firebase/firestore';
-import { COMMAND_HISTORY_COLLECTION, type Command, CommandSchema } from '../models/CommandHistory';
+import { z } from 'zod';
+
+// コマンド履歴のコレクション名
+export const COMMAND_HISTORY_COLLECTION = 'command_history';
+
+// コマンドスキーマの定義
+export const CommandSchema = z.object({
+  command: z.string().min(1, 'Command is required'),
+  timestamp: z.date().optional(),
+  userId: z.string().optional(),
+  status: z.enum(['success', 'error', 'pending']),
+  output: z.string().optional(),
+  workingDirectory: z.string().optional(),
+  environment: z.record(z.string()).optional(),
+});
+
+// コマンドの型定義
+export type Command = z.infer<typeof CommandSchema>;
+
+// コマンド履歴のドキュメントの型をエクスポート
+export type CommandDocument = FirestoreDocument<Command>;
 
 // シングルトンインスタンスを保持
 let repositoryInstance: EventSourcedRepository<Command> | null = null;
@@ -24,6 +44,3 @@ export const createCommandHistoryRepository = (db: Firestore) => {
 
   return repositoryInstance;
 };
-
-// コマンド履歴のドキュメントの型をエクスポート
-export type CommandDocument = FirestoreDocument<Command>;

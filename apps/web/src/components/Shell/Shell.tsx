@@ -4,8 +4,8 @@ import { FaExclamationTriangle, FaHistory } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
 import { db } from '../../firebase/config';
 import { useAuth } from '../../hooks/useAuth';
-import type { Command } from '../../models/CommandHistory';
 import {
+  type Command,
   type CommandDocument,
   createCommandHistoryRepository,
 } from '../../repositories/CommandHistoryRepository';
