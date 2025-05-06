@@ -22,7 +22,7 @@ export interface FirestoreChangeEvent<T = DocumentData> {
  * @param callback - Function that will be called with the change event containing type, id, and data
  * @returns An unsubscribe function that can be called to stop watching for changes
  */
-export function watchFirestore<T = DocumentData>(
+export function watchCollection<T = DocumentData>(
   db: Firestore,
   collectionPath: string,
   callback: (event: FirestoreChangeEvent<T>) => void
