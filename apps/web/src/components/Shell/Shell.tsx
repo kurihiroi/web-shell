@@ -1,4 +1,5 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { BsTerminal } from 'react-icons/bs';
 import { FaExclamationTriangle, FaHistory } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
@@ -10,7 +11,7 @@ import {
   createCommandHistoryRepository,
 } from '../../repositories/CommandHistoryRepository';
 
-export default function Shell() {
+export function Shell() {
   const [command, setCommand] = useState('');
   const [commandHistory, setCommandHistory] = useState<Command[]>([]);
   const [output, setOutput] = useState<string>('');

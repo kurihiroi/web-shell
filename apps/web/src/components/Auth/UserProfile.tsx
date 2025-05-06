@@ -7,7 +7,7 @@ interface UserProfileProps {
   className?: string;
 }
 
-export default function UserProfile({ className = '' }: UserProfileProps): ReactElement {
+export function UserProfile({ className = '' }: UserProfileProps): ReactElement {
   const { currentUser, logout, loading } = useAuth();
 
   if (loading) {

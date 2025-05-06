@@ -1,13 +1,13 @@
 import type { ReactElement } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import GoogleSignInButton from './GoogleSignInButton';
-import UserProfile from './UserProfile';
+import { GoogleSignInButton } from './GoogleSignInButton';
+import { UserProfile } from './UserProfile';
 
 interface AuthStatusProps {
   className?: string;
 }
 
-export default function AuthStatus({ className = '' }: AuthStatusProps): ReactElement {
+export function AuthStatus({ className = '' }: AuthStatusProps): ReactElement {
   const { currentUser, loading, error } = useAuth();
 
   return (

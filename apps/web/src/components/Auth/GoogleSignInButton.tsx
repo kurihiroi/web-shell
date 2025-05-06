@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
+import { useEffect, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -8,7 +8,7 @@ interface GoogleSignInButtonProps {
   className?: string;
 }
 
-export default function GoogleSignInButton({
+export function GoogleSignInButton({
   text = 'Sign in with Google',
   className = '',
 }: GoogleSignInButtonProps): ReactElement {
