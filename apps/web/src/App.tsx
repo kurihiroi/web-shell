@@ -1,8 +1,6 @@
 import type { ReactElement } from 'react';
-import { BsTerminalFill } from 'react-icons/bs';
 import { FaFireAlt } from 'react-icons/fa';
 import { AuthStatus } from './components/Auth/AuthStatus';
-import { Shell } from './components/Shell/Shell';
 
 export function App(): ReactElement {
   return (
@@ -15,14 +13,6 @@ export function App(): ReactElement {
           Firebase Auth Example
         </h3>
         <AuthStatus />
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-3 flex items-center justify-center">
-          <BsTerminalFill className="mr-2" />
-          Web Shell
-        </h3>
-        <Shell />
       </div>
     </div>
   );
