@@ -1,39 +1,16 @@
 import type { User } from 'firebase/auth';
-import { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   getAuthRedirectResult,
+  getCurrentUser,
   logOut,
   signInWithGooglePopup,
   signInWithGoogleRedirect,
   subscribeToAuthChanges,
 } from '../firebase/auth';
 
-interface AuthContextType {
-  currentUser: User | null;
-  user: User | null; // エイリアスとしてuserも追加
-  loading: boolean;
-  error: Error | null;
-  signInWithGoogleRedirect: () => Promise<void>;
-  signInWithGooglePopup: () => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function useAuth(): AuthContextType {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+export function useAuth() {
+  const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -68,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // リダイレクト認証を使用
-  const signInWithGoogleRedirectImpl = async () => {
+  const signInWithGoogleRedirectImpl = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -79,10 +56,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(false);
       throw error;
     }
-  };
+  }, []);
 
   // ポップアップ認証を使用
-  const signInWithGooglePopupImpl = async () => {
+  const signInWithGooglePopupImpl = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -96,10 +73,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Sign out
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -111,9 +88,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const value = {
+  return {
     currentUser,
     user: currentUser, // userをcurrentUserのエイリアスとして追加
     loading,
@@ -122,6 +99,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signInWithGooglePopup: signInWithGooglePopupImpl,
     logout,
   };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

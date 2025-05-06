@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { BiLoaderAlt } from 'react-icons/bi';
 import { FiLogOut } from 'react-icons/fi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 interface UserProfileProps {
   className?: string;
