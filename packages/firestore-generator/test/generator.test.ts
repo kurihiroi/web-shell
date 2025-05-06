@@ -1,7 +1,7 @@
 import type { Firestore, QueryConstraint } from 'firebase/firestore';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { firestoreGenerator } from '../src/generator';
+import { createCollection } from '../src/generator';
 
 // Define a mock Firestore type for testing
 interface MockFirestore extends Partial<Firestore> {
@@ -44,7 +44,7 @@ vi.mock('../src/utils', async () => {
   };
 });
 
-describe('firestoreGenerator', () => {
+describe('createCollection', () => {
   const userSchema = z.object({
     name: z.string(),
     email: z.string().email(),
@@ -53,11 +53,11 @@ describe('firestoreGenerator', () => {
 
   type User = z.infer<typeof userSchema>;
 
-  let userCollection: ReturnType<typeof firestoreGenerator.createCollection<User>>;
+  let userCollection: ReturnType<typeof createCollection<User>>;
   const mockDb: MockFirestore = {};
 
   beforeEach(() => {
-    userCollection = firestoreGenerator.createCollection<User>('users', userSchema);
+    userCollection = createCollection<User>('users', userSchema);
     vi.clearAllMocks();
   });
 
