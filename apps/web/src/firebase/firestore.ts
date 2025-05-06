@@ -83,16 +83,19 @@ export function createConverter<T>(schema: z.ZodType<T>): FirestoreDataConverter
  * @param db - Firestore database instance
  * @param collectionPath - Path to the Firestore collection to watch
  * @param callback - Function that will be called with the change event containing type, id, and data
- * @param converter - Firestore data converter for type validation
+ * @param schema - Zod schema for validating document data
  * @returns An unsubscribe function that can be called to stop watching for changes
  */
-export function watchCollection<T = DocumentData>(
+export function watchCollection<T>(
   db: Firestore,
   collectionPath: string,
   callback: (event: FirestoreChangeEvent<T>) => void,
-  converter: FirestoreDataConverter<T>
+  schema: z.ZodType<T>
 ): () => void {
   try {
+    // Create a converter from the schema
+    const converter = createConverter(schema);
+
     // Create a collection reference with the converter
     const collectionRef = collection(db, collectionPath).withConverter(converter);
 
@@ -142,26 +145,6 @@ export function watchCollection<T = DocumentData>(
 }
 
 /**
- * Convenience function to watch a collection with a Zod schema instead of a converter
- *
- * @param db - Firestore database instance
- * @param collectionPath - Path to the Firestore collection to watch
- * @param callback - Function that will be called with the change event containing type, id, and data
- * @param schema - Zod schema for validating document data
- * @returns An unsubscribe function that can be called to stop watching for changes
- */
-export function watchCollectionWithSchema<T>(
-  db: Firestore,
-  collectionPath: string,
-  callback: (event: FirestoreChangeEvent<T>) => void,
-  schema: z.ZodType<T>
-): () => void {
-  // Create a converter from the schema and use watchCollection
-  const converter = createConverter(schema);
-  return watchCollection(db, collectionPath, callback, converter);
-}
-
-/**
  * Example usage:
  *
  * ```typescript
@@ -177,11 +160,8 @@ export function watchCollectionWithSchema<T>(
  * // Infer TypeScript type from the schema
  * type User = z.infer<typeof userSchema>;
  *
- * // Create a converter from the schema
- * const userConverter = createConverter(userSchema);
- *
- * // Option 1: Use with converter
- * const unsubscribe1 = watchCollection<User>(
+ * // Use watchCollection with the schema
+ * const unsubscribe = watchCollection<User>(
  *   db,
  *   'users',
  *   (event) => {
@@ -190,22 +170,15 @@ export function watchCollectionWithSchema<T>(
  *     // event.data is fully typed as User
  *     console.log(`User ${event.data.name} is ${event.data.age} years old`);
  *   },
- *   userConverter
- * );
- *
- * // Option 2: Use with schema directly (convenience function)
- * const unsubscribe2 = watchCollectionWithSchema<User>(
- *   db,
- *   'users',
- *   (event) => {
- *     // Same as above, event.data is User type
- *     console.log(`User ${event.data.name} is ${event.data.age} years old`);
- *   },
  *   userSchema
  * );
  *
+ * // If you need a converter for other Firestore operations
+ * const userConverter = createConverter(userSchema);
+ * // Use userConverter with other Firestore operations like:
+ * // const userRef = doc(db, 'users', userId).withConverter(userConverter);
+ *
  * // Don't forget to unsubscribe when done
- * // unsubscribe1();
- * // unsubscribe2();
+ * // unsubscribe();
  * ```
  */
